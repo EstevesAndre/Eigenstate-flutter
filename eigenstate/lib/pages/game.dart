@@ -1,3 +1,4 @@
+import 'package:eigenstate/components/board.dart';
 import 'package:flutter/material.dart';
 
 import 'package:eigenstate/services/board.dart';
@@ -22,9 +23,114 @@ class GameState extends State<GamePage> {
         child: Scaffold(
           backgroundColor: Colors.white,
           body: SafeArea(
-            child: Text(
-              "TOCTOC",
-            ),
+            child: StreamBuilder<MapEntry<int, int>>(
+              stream: boardService.score$,
+              builder: (context, AsyncSnapshot<MapEntry<int, int>> snapshot) {
+                if (!snapshot.hasData) {
+                  return Container();
+                }
+                final int p1Score = snapshot.data.key;
+                final int p2Score = snapshot.data.value;
+
+                return Container(
+                  width: MediaQuery.of(context).size.width,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: <Widget>[
+                      Expanded(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.max,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.white,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  SizedBox(
+                                    height: 40,
+                                    width: 40,
+                                    child: Material(
+                                      elevation: 5,
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Center(
+                                          child: Text(
+                                            "$p1Score",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18),
+                                          )),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Text(
+                                      "Player",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                            Container(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[Board()],
+                              )),
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 20),
+                              color: Colors.white,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                    ),
+                                    child: Text(
+                                      "Player",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Container(),
+                                  ),
+                                  SizedBox(
+                                    height: 40,
+                                    width: 40,
+                                    child: Material(
+                                      elevation: 5,
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: Center(
+                                          child: Text(
+                                            "$p2Score",
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 18),
+                                          )),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            )
           ),
         ),
       ),
