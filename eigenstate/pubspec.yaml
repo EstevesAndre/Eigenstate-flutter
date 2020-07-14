@@ -27,6 +27,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  rxdart: ^0.24.1
+  get_it: ^4.0.2
 
 
 # For information on the generic Dart part of this file, see the
@@ -70,3 +72,16 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+  fonts:
+    - family: DancingScript
+      fonts:
+        - asset: fonts/DancingScript-Regular.ttf
+        - asset: fonts/DancingScript-Bold.ttf
+          weight: 700
+
+    - family: Poppins
+      fonts:
+        - asset: fonts/Poppins-Regular.ttf
+        - asset: fonts/Poppins-Bold.ttf
+          weight: 700
