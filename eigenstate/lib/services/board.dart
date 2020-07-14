@@ -58,7 +58,7 @@ class BoardService {
 
   void resetBoard() {
     _board$.add([
-      [PieceService(1, Owner.P2), PieceService(2, Owner.P2), PieceService(3, Owner.P2), PieceService(4, Owner.P2), PieceService(5, Owner.P2), PieceService(6, Owner.P2)],
+      [PieceService(6, Owner.P2), PieceService(5, Owner.P2), PieceService(4, Owner.P2), PieceService(3, Owner.P2), PieceService(2, Owner.P2), PieceService(1, Owner.P2)],
       [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
       [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
       [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
@@ -80,7 +80,7 @@ class BoardService {
 
   void _initStreams() {
     _board$ = BehaviorSubject<List<List<PieceService>>>.seeded([
-      [PieceService(1, Owner.P2), PieceService(2, Owner.P2), PieceService(3, Owner.P2), PieceService(4, Owner.P2), PieceService(5, Owner.P2), PieceService(6, Owner.P2)],
+      [PieceService(6, Owner.P2), PieceService(5, Owner.P2), PieceService(4, Owner.P2), PieceService(3, Owner.P2), PieceService(2, Owner.P2), PieceService(1, Owner.P2)],
       [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
       [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
       [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
