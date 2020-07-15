@@ -6,7 +6,6 @@ import 'package:eigenstate/services/board.dart';
 import 'package:eigenstate/services/piece.dart';
 
 class Piece extends StatelessWidget {
-
   final double size;
   final Color color;
 
@@ -27,33 +26,50 @@ class Piece extends StatelessWidget {
           stops: [1, 1],
         ),
       ),
-      child: Stack(
-        children: <Widget>[
-          Positioned(
-            left: size/2 - 3,
-            top: size/2 - 3,
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(200),
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  stops: [0.1, 0.8],
-                  colors: [
-                    Colors.white,
-                    Colors.green
-                  ],
+      child: Container(
+        margin: EdgeInsets.all(4),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: item.piece$.value
+              .asMap()
+              .map(
+                (i, row) => MapEntry(
+                  i,
+                  Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: row
+                        .asMap()
+                        .map(
+                          (j, it) => MapEntry(
+                            j,
+                            i == 2 && j == 2 ? Container() : _buildPin(i, j, item.own$.value, it),
+                          ),
+                        )
+                        .values
+                        .toList(),
+                  ),
                 ),
-              ),
-              height: 5,
-              width: 5,
-            ),
-          ),
-          Text(
-            item.id$.value.toString()
-          )
-        ],
+              )
+              .values
+              .toList(),
+        ),
       ),
+    );
+  }
+
+  Widget _buildPin(int i, int j, Player p, Pin pin) {
+    double size = 4;
+
+    return Container(
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          color: p == Player.P1 ? (pin == Pin.Active ? Themes.p1PinSelected : Themes.p1PinEmpty) : (pin == Pin.Active ? Themes.p2PinSelected : Themes.p2PinEmpty),
+        )
     );
   }
 }

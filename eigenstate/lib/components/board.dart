@@ -1,4 +1,5 @@
 import 'package:eigenstate/components/piece.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
@@ -43,33 +44,14 @@ class _BoardState extends State<Board> {
           if (state.value == null) {
             title = "Draw";
           }
-
-//          Widget body = state.value == 'X'
-//              ? X(50, 20)
-//              : (state.value == "O"
-//              ? O(50, MyTheme.green)
-//              : Row(
-//            children: <Widget>[X(50, 20), O(50, MyTheme.green)],
-//          ));
-
-//          WidgetsBinding.instance.addPostFrameCallback((_) => {
-//            Alert(
-//              context: context,
-//              title: title,
-//              style: alertService.resultAlertStyle,
-//              buttons: [],
-//              content: Row(
-//                  mainAxisSize: MainAxisSize.max,
-//                  mainAxisAlignment: MainAxisAlignment.center,
-//                  children: <Widget>[body]),
-//            ).show()
-//          });
         }
+
+        bool hasTransform = false;
 
         return Transform(
           transform: Matrix4.identity()
-            ..setEntry(3, 2, 0.07)
-            ..rotateX(-0.01),
+            ..setEntry(3, 2, hasTransform ? 0.07 : 0.0)
+            ..rotateX(hasTransform ? -0.01 : 0.0),
           alignment: FractionalOffset.center,
           child: Container(
             child: Column(
@@ -89,9 +71,14 @@ class _BoardState extends State<Board> {
                       j,
                       GestureDetector(
                         onTap: () {
-  //                          if (board[i][j] != ' ') return;
-  //                          boardService.newMove(i, j);
-                          print("CLICKED " + i.toString() + " " + j.toString() + "\n");
+//                          if (board[i][j].own$.value == null) return;
+//                          if (board[i][j].own$.value != boardService.getPlaying()) return;
+
+                          print("Clicked on piece " + i.toString() + " " + j.toString());
+                          int ret = boardService.handleClick(i, j);
+                          if (ret == 1) {
+                            showPiecePopUp(i, j);
+                          }
                         },
                         child: _buildBox(i, j, item),
                         ),
@@ -132,8 +119,59 @@ class _BoardState extends State<Board> {
       width: size,
       child: Center(
         child:
-          item.own$.value == Owner.Empty ? null : Piece(size * 5/6, item.own$.value == Owner.P1 ? Themes.p1Blue : Themes.p1Grey, item),
+          item.own$.value == null ? null : Piece(size * 5/6, item.own$.value == Player.P1 ? Themes.p1Blue : Themes.p1Grey, item),
       ),
     );
+  }
+
+  showPiecePopUp(int i, int j) async {
+    List<List<Pin>> pins = boardService.getPiecePins(i, j);
+
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0)
+        ),
+        contentPadding: EdgeInsets.all(0),
+        content: Container(
+          height: 280,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.elliptical(5, 5)),
+            gradient: RadialGradient(
+              radius: 0.05,
+              colors: [Colors.transparent, Colors.red],
+              stops: [1, 1],
+            ),
+          ),
+          child: Stack(
+            children: <Widget>[
+              Positioned(
+                left: 200/2 - 3,
+                top: 200/2 - 3,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(200),
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      stops: [0.1, 0.8],
+                      colors: [
+                        Colors.white,
+                        Colors.green
+                      ],
+                    ),
+                  ),
+                  height: 5,
+                  width: 5,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((val) {
+      boardService.popUpClosed();
+    });
   }
 }
