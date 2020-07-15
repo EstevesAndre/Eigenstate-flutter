@@ -14,7 +14,13 @@ enum Player { P1, P2 }
 enum BoardState { EndGame, Play }
 enum GameMode { Solo }
 enum Difficulty { Easy, Medium, Hard }
-enum Phase { ChoosePieceToMove, Destination, ChoosePieceToPin, ChoosePins, Done }
+enum Phase {
+  ChoosePieceToMove,
+  Destination,
+  ChoosePieceToPin,
+  ChoosePins,
+  Done
+}
 
 class BoardService {
   static const size = 6;
@@ -50,7 +56,7 @@ class BoardService {
   }
 
   Player _checkWinner() {
-    // TODO 
+    // TODO
     return null;
   }
 
@@ -119,7 +125,7 @@ class BoardService {
   int handleClick(int i, int j) {
     print(turnPhase);
 
-    switch(turnPhase) {
+    switch (turnPhase) {
       case Phase.ChoosePieceToMove:
         if (checkPiece(i, j)) {
           turnPhase = Phase.Destination;
@@ -140,7 +146,6 @@ class BoardService {
         }
         break;
       case Phase.ChoosePins:
-
         break;
       default:
     }
@@ -170,7 +175,8 @@ class BoardService {
       return false;
     }
 
-    return currentBoard[piece.getI()][piece.getJ()].checkDestinationReachable(i, j);
+    return currentBoard[piece.getI()][piece.getJ()]
+        .checkDestinationReachable(i, j);
   }
 
   void executeMove(int i, int j) {
@@ -200,16 +206,57 @@ class BoardService {
   }
 
   void resetBoard() {
-
     print("Reset Board\n");
 
     _board$.add([
-      [PieceService(6, Player.P2), PieceService(5, Player.P2), PieceService(4, Player.P2), PieceService(3, Player.P2), PieceService(2, Player.P2), PieceService(1, Player.P2)],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService(1, Player.P1), PieceService(2, Player.P1), PieceService(3, Player.P1), PieceService(4, Player.P1), PieceService(5, Player.P1), PieceService(6, Player.P1)]
+      [
+        PieceService(6, Player.P2),
+        PieceService(5, Player.P2),
+        PieceService(4, Player.P2),
+        PieceService(3, Player.P2),
+        PieceService(2, Player.P2),
+        PieceService(1, Player.P2)
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService(1, Player.P1),
+        PieceService(2, Player.P1),
+        PieceService(3, Player.P1),
+        PieceService(4, Player.P1),
+        PieceService(5, Player.P1),
+        PieceService(6, Player.P1)
+      ]
     ]);
 
     setPlayerStart();
@@ -220,7 +267,6 @@ class BoardService {
     turnPhase = Phase.ChoosePieceToMove;
     piece = Coordinate.origin();
     pinsSelected = 0;
-
   }
 
   void newGame() {
@@ -229,21 +275,64 @@ class BoardService {
   }
 
   void _initStreams() {
-
     print("Initiate Streams\n");
 
     _board$ = BehaviorSubject<List<List<PieceService>>>.seeded([
-      [PieceService(6, Player.P2), PieceService(5, Player.P2), PieceService(4, Player.P2), PieceService(3, Player.P2), PieceService(2, Player.P2), PieceService(1, Player.P2)],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty(), PieceService.empty()],
-      [PieceService(1, Player.P1), PieceService(2, Player.P1), PieceService(3, Player.P1), PieceService(4, Player.P1), PieceService(5, Player.P1), PieceService(6, Player.P1)]
+      [
+        PieceService(6, Player.P2),
+        PieceService(5, Player.P2),
+        PieceService(4, Player.P2),
+        PieceService(3, Player.P2),
+        PieceService(2, Player.P2),
+        PieceService(1, Player.P2)
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService(1, Player.P1),
+        PieceService(2, Player.P1),
+        PieceService(3, Player.P1),
+        PieceService(4, Player.P1),
+        PieceService(5, Player.P1),
+        PieceService(6, Player.P1)
+      ]
     ]);
 
-    _rounds$ = BehaviorSubject<MapEntry<int, Player>>.seeded(MapEntry(1, Player.P1));
+    _rounds$ =
+        BehaviorSubject<MapEntry<int, Player>>.seeded(MapEntry(1, Player.P1));
 
-    _boardState$ = BehaviorSubject<MapEntry<BoardState, Player>>.seeded(MapEntry(BoardState.Play, null));
+    _boardState$ = BehaviorSubject<MapEntry<BoardState, Player>>.seeded(
+        MapEntry(BoardState.Play, null));
 
     _gameMode$ = BehaviorSubject<GameMode>.seeded(GameMode.Solo);
 

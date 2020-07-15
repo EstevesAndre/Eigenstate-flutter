@@ -45,7 +45,9 @@ class Piece extends StatelessWidget {
                         .map(
                           (j, it) => MapEntry(
                             j,
-                            i == 2 && j == 2 ? Container() : _buildPin(i, j, item.own$.value, it),
+                            i == 2 && j == 2
+                                ? Container()
+                                : _buildPin(i, j, item.own$.value, it),
                           ),
                         )
                         .values
@@ -68,8 +70,9 @@ class Piece extends StatelessWidget {
         width: size,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
-          color: p == Player.P1 ? (pin == Pin.Active ? Themes.p1PinSelected : Themes.p1PinEmpty) : (pin == Pin.Active ? Themes.p2PinSelected : Themes.p2PinEmpty),
-        )
-    );
+          color: p == Player.P1
+              ? (pin == Pin.Active ? Themes.p1PinSelected : Themes.p1PinEmpty)
+              : (pin == Pin.Active ? Themes.p2PinSelected : Themes.p2PinEmpty),
+        ));
   }
 }

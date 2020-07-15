@@ -10,7 +10,6 @@ import 'package:eigenstate/services/piece.dart';
 
 import 'package:eigenstate/theme/theme.dart';
 
-
 class Board extends StatefulWidget {
   Board({Key key}) : super(key: key);
 
@@ -23,79 +22,84 @@ class _BoardState extends State<Board> {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<MapEntry<List<List<PieceService>>, MapEntry<BoardState, Player>>>(
-      stream: Rx.combineLatest2(boardService.board$, boardService.boardState$, (a, b) => MapEntry(a, b)),
-      builder:(
-          context,
-          AsyncSnapshot<MapEntry<List<List<PieceService>>, MapEntry<BoardState, Player>>> snapshot)
-      {
-        if (!snapshot.hasData) {
-          return Container();
-        }
-
-        final List<List<PieceService>> board = snapshot.data.key;
-        final MapEntry<BoardState, Player> state = snapshot.data.value;
-
-        if (state.key == BoardState.EndGame) {
-          boardService.resetBoard();
-
-          String title = 'Winner';
-
-          if (state.value == null) {
-            title = "Draw";
+    return StreamBuilder<
+            MapEntry<List<List<PieceService>>, MapEntry<BoardState, Player>>>(
+        stream: Rx.combineLatest2(boardService.board$, boardService.boardState$,
+            (a, b) => MapEntry(a, b)),
+        builder: (context,
+            AsyncSnapshot<
+                    MapEntry<List<List<PieceService>>,
+                        MapEntry<BoardState, Player>>>
+                snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
           }
-        }
 
-        bool hasTransform = false;
+          final List<List<PieceService>> board = snapshot.data.key;
+          final MapEntry<BoardState, Player> state = snapshot.data.value;
 
-        return Transform(
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, hasTransform ? 0.07 : 0.0)
-            ..rotateX(hasTransform ? -0.01 : 0.0),
-          alignment: FractionalOffset.center,
-          child: Container(
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: board
-                  .asMap()
-                  .map(
-                    (i, row) => MapEntry(
-                  i,
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: row
-                      .asMap()
-                      .map(
-                        (j, item) => MapEntry(
-                      j,
-                      GestureDetector(
-                        onTap: () {
+          if (state.key == BoardState.EndGame) {
+            boardService.resetBoard();
+
+            String title = 'Winner';
+
+            if (state.value == null) {
+              title = "Draw";
+            }
+          }
+
+          bool hasTransform = false;
+
+          return Transform(
+            transform: Matrix4.identity()
+              ..setEntry(3, 2, hasTransform ? 0.07 : 0.0)
+              ..rotateX(hasTransform ? -0.01 : 0.0),
+            alignment: FractionalOffset.center,
+            child: Container(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: board
+                    .asMap()
+                    .map(
+                      (i, row) => MapEntry(
+                        i,
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: row
+                              .asMap()
+                              .map(
+                                (j, item) => MapEntry(
+                                  j,
+                                  GestureDetector(
+                                    onTap: () {
 //                          if (board[i][j].own$.value == null) return;
 //                          if (board[i][j].own$.value != boardService.getPlaying()) return;
 
-                          print("Clicked on piece " + i.toString() + " " + j.toString());
-                          int ret = boardService.handleClick(i, j);
-                          if (ret == 1) {
-                            showPiecePopUp(i, j);
-                          }
-                        },
-                        child: _buildBox(i, j, item),
+                                      print("Clicked on piece " +
+                                          i.toString() +
+                                          " " +
+                                          j.toString());
+                                      int ret = boardService.handleClick(i, j);
+                                      if (ret == 1) {
+                                        showPiecePopUp(i, j);
+                                      }
+                                    },
+                                    child: _buildBox(i, j, item),
+                                  ),
+                                ),
+                              )
+                              .values
+                              .toList(),
                         ),
                       ),
                     )
                     .values
                     .toList(),
-                  ),
-                ),
-              )
-              .values
-              .toList(),
+              ),
             ),
-          ),
-        );
-      }
-    );
+          );
+        });
   }
 
   Widget _buildBox(int i, int j, PieceService item) {
@@ -104,11 +108,10 @@ class _BoardState extends State<Board> {
     double size = 50;
 
     border = Border(
-      top: i == 0 ? borderStyle : BorderSide.none,
-      bottom: borderStyle,
-      left: j == 0 ? borderStyle : BorderSide.none,
-      right: borderStyle
-    );
+        top: i == 0 ? borderStyle : BorderSide.none,
+        bottom: borderStyle,
+        left: j == 0 ? borderStyle : BorderSide.none,
+        right: borderStyle);
 
     return Container(
       decoration: BoxDecoration(
@@ -118,8 +121,12 @@ class _BoardState extends State<Board> {
       height: size,
       width: size,
       child: Center(
-        child:
-          item.own$.value == null ? null : Piece(size * 5/6, item.own$.value == Player.P1 ? Themes.p1Blue : Themes.p1Grey, item),
+        child: item.own$.value == null
+            ? null
+            : Piece(
+                size * 5 / 6,
+                item.own$.value == Player.P1 ? Themes.p1Blue : Themes.p1Grey,
+                item),
       ),
     );
   }
@@ -130,9 +137,8 @@ class _BoardState extends State<Board> {
     await showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0)
-        ),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         contentPadding: EdgeInsets.all(0),
         content: Container(
           height: 280,
@@ -147,8 +153,8 @@ class _BoardState extends State<Board> {
           child: Stack(
             children: <Widget>[
               Positioned(
-                left: 200/2 - 3,
-                top: 200/2 - 3,
+                left: 200 / 2 - 3,
+                top: 200 / 2 - 3,
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(200),
@@ -156,10 +162,7 @@ class _BoardState extends State<Board> {
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                       stops: [0.1, 0.8],
-                      colors: [
-                        Colors.white,
-                        Colors.green
-                      ],
+                      colors: [Colors.white, Colors.green],
                     ),
                   ),
                   height: 5,

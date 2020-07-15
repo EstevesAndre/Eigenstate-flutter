@@ -32,16 +32,15 @@ class HomePage extends StatelessWidget {
           body: Container(
             width: MediaQuery.of(context).size.width,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: [0.1, 0.65],
-                colors: [
-                  Themes.p1Grey,
-                  Themes.p1Blue,
-                ],
-              )
-            ),
+                gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              stops: [0.1, 0.65],
+              colors: [
+                Themes.p1Grey,
+                Themes.p1Blue,
+              ],
+            )),
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: <Widget>[
@@ -141,10 +140,7 @@ class HomePage extends StatelessWidget {
                             height: 50,
                             width: 50,
                             borderRadius: 25,
-                            child: Icon(
-                                Icons.ac_unit,
-                              color: Themes.p1Grey
-                            ),
+                            child: Icon(Icons.ac_unit, color: Themes.p1Grey),
                           ),
                         ],
                       ),

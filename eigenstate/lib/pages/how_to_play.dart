@@ -6,18 +6,17 @@ class HowToPlayPage extends StatefulWidget {
 }
 
 class HowToPlayState extends State<HowToPlayPage> {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: SafeArea(
-            child: Text(
-              "TOCTOC",
-            ),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Text(
+            "TOCTOC",
           ),
         ),
+      ),
     );
   }
 }

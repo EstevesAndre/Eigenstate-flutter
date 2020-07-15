@@ -1,4 +1,3 @@
-
 class Coordinate {
   int i;
   int j;

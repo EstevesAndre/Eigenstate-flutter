@@ -11,13 +11,13 @@ class Btn extends StatelessWidget {
 
   Btn(
       {Key key,
-        this.gradient,
-        this.color,
-        this.onTap,
-        this.child,
-        this.borderRadius = 0,
-        this.height,
-        this.width})
+      this.gradient,
+      this.color,
+      this.onTap,
+      this.child,
+      this.borderRadius = 0,
+      this.height,
+      this.width})
       : super(key: key);
 
   @override
@@ -33,10 +33,10 @@ class Btn extends StatelessWidget {
           gradient: this.gradient == null
               ? null
               : LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: gradient),
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  stops: [0.1, 0.8],
+                  colors: gradient),
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withOpacity(.1),

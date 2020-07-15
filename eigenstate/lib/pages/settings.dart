@@ -7,7 +7,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsPageState extends State<SettingsPage> {
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(

@@ -18,7 +18,6 @@ class _GameTypeState extends State<GameType> {
   final boardService = locator<BoardService>();
   final soundService = locator<SoundService>();
 
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -60,7 +59,6 @@ class _GameTypeState extends State<GameType> {
                   children: <Widget>[
                     Btn(
                       onTap: () {
-                        boardService.resetBoard();
                         boardService.setGameDifficulty(Difficulty.Easy);
 //                        soundService.playSound('click');
 
@@ -86,7 +84,6 @@ class _GameTypeState extends State<GameType> {
                     SizedBox(height: 30),
                     Btn(
                       onTap: () {
-                        boardService.resetBoard();
                         boardService.setGameDifficulty(Difficulty.Medium);
 //                        soundService.playSound('click');
 
@@ -112,7 +109,6 @@ class _GameTypeState extends State<GameType> {
                     SizedBox(height: 30),
                     Btn(
                       onTap: () {
-                        boardService.resetBoard();
                         boardService.setGameDifficulty(Difficulty.Hard);
 //                        soundService.playSound('click');
 
