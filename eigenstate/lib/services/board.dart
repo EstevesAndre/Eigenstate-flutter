@@ -55,11 +55,6 @@ class BoardService {
     _initStreams();
   }
 
-  Player _checkWinner() {
-    // TODO
-    return null;
-  }
-
   String getGameDifficulty() {
     switch (_gameDifficulty$.value) {
       case Difficulty.Easy:
@@ -91,13 +86,50 @@ class BoardService {
     return _rounds$.value.value;
   }
 
-  List<List<Pin>> getPiecePins(int i, int j) {
-    return _board$.value[i][j].getPins();
+  Player checkWinner() {
+    // Primary Goal
+    // // reduce oponnent to one piece remaining
+    int nP1 = 0, nP2 = 0;
+    _board$.value.forEach((line) => line.forEach((piece) =>
+        piece.own$.value == Player.P1
+            ? nP1++
+            : piece.own$.value == Player.P2 ? nP2++ : null));
+
+    print(nP1.toString() + " " + nP2.toString());
+    if (nP1 == 1)
+      return Player.P2;
+    else if (nP2 == 1) return Player.P1;
+
+    // Secondary Goal
+    // // both players with exactly 2 pieces:
+    // // // wins the first one to fill all pins in a remaining piece
+    Player winner;
+    if (nP1 == 2 && nP2 == 2) {
+      _board$.value.forEach((line) => line.forEach((piece) =>
+          piece.own$.value != null
+              ? piece.checkFullPin() ? winner = piece.own$.value : null
+              : null));
+    }
+
+    return winner;
   }
 
   void nextTurn() {
+    Player p = checkWinner();
+
+    if (p != null) {
+      print("GANHOUU");
+      print(p);
+      // TODO
+      //parar o jogo.
+
+      return;
+    }
+
+    print("New Turn");
+
     int round = _rounds$.value.key;
-    Player actual = _rounds$.value.value;
+    Player actual = getPlaying();
 
     if (_start == actual) {
       _rounds$.add(MapEntry(round, _second));
@@ -106,20 +138,8 @@ class BoardService {
     }
 
     turnPhase = Phase.ChoosePieceToMove;
-  }
-
-  void play(int i, int j) {
-    List<List<PieceService>> currentBoard = _board$.value;
-
-    PieceService piece = currentBoard[i][j];
-    PieceService pempty = currentBoard[4][0];
-
-    currentBoard[4][0] = piece;
-    currentBoard[i][j] = pempty;
-
-    nextTurn();
-
-    _board$.add(currentBoard);
+    piece.clean();
+    pinsSelected = 0;
   }
 
   int handleClick(int i, int j) {
@@ -146,6 +166,17 @@ class BoardService {
         }
         break;
       case Phase.ChoosePins:
+        List<List<PieceService>> currentBoard = _board$.value;
+        if (currentBoard[piece.getI()][piece.getJ()].checkPin(i, j)) {
+          pinsSelected++;
+          currentBoard[piece.getI()][piece.getJ()].addPin(i, j);
+          _board$.add(currentBoard);
+
+          if (pinsSelected == 2)
+            return 2; // finish phase
+          else
+            return 3; // alert dialog change
+        }
         break;
       default:
     }
@@ -176,7 +207,7 @@ class BoardService {
     }
 
     return currentBoard[piece.getI()][piece.getJ()]
-        .checkDestinationReachable(i, j);
+        .checkDestinationReachable(piece.getI(), piece.getJ(), i, j);
   }
 
   void executeMove(int i, int j) {
@@ -203,6 +234,10 @@ class BoardService {
     }
 
     turnPhase = Phase.ChoosePieceToPin;
+  }
+
+  void popUpOpened() {
+    turnPhase = Phase.ChoosePins;
   }
 
   void resetBoard() {

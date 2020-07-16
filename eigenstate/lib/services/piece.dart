@@ -4,6 +4,8 @@ import 'package:eigenstate/services/board.dart';
 enum Pin { Center, Active, Disable }
 
 class PieceService {
+  static const size = 5;
+
   BehaviorSubject<int> _id$;
   BehaviorSubject<int> get id$ => _id$;
 
@@ -21,14 +23,52 @@ class PieceService {
     _own$ = BehaviorSubject<Player>.seeded(null);
   }
 
-  bool checkDestinationReachable(int i, int j) {
-    // TODO missing verifications
+  bool checkDestinationReachable(
+      int positionI, int positionJ, int destinationI, int destinationJ) {
+    int offsetI = destinationI - positionI;
+    int offsetJ = destinationJ - positionJ;
 
-    return true;
+//    print("Pos: " + positionI.toString() + " " + positionJ.toString());
+//    print("Des: " + destinationI.toString() + " " + destinationJ.toString());
+//    print("Offset: " + offsetI.toString() + " " + offsetJ.toString());
+
+    if (offsetI < -2 || offsetJ < -2 || offsetI > 2 || offsetJ > 2)
+      return false;
+
+    return _piece$.value[2 + offsetI][2 + offsetJ] == Pin.Active;
   }
 
   List<List<Pin>> getPins() {
     return _piece$.value;
+  }
+
+  bool checkFullPin() {
+    bool isFull = true;
+
+    _piece$.value.forEach((line) =>
+        line.forEach((pin) => pin == Pin.Disable ? isFull = false : null));
+
+    return isFull;
+  }
+
+  bool checkPin(int i, int j) {
+    if (handleInput(i, j)) return false;
+
+    List<List<Pin>> currentPins = _piece$.value;
+
+    return currentPins[i][j] == Pin.Disable;
+  }
+
+  void addPin(int i, int j) {
+    List<List<Pin>> actual = _piece$.value;
+
+    actual[i][j] = Pin.Active;
+
+    _piece$.add(actual);
+  }
+
+  bool handleInput(int i, int j) {
+    return i >= size || j >= size || i < 0 || j < 0;
   }
 
   void _initStreams(int _id, Player _own) {

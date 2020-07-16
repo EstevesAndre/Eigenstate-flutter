@@ -48,7 +48,7 @@ class _BoardState extends State<Board> {
             }
           }
 
-          bool hasTransform = false;
+          bool hasTransform = true;
 
           return Transform(
             transform: Matrix4.identity()
@@ -73,16 +73,14 @@ class _BoardState extends State<Board> {
                                   j,
                                   GestureDetector(
                                     onTap: () {
-//                          if (board[i][j].own$.value == null) return;
-//                          if (board[i][j].own$.value != boardService.getPlaying()) return;
-
                                       print("Clicked on piece " +
                                           i.toString() +
                                           " " +
                                           j.toString());
+
                                       int ret = boardService.handleClick(i, j);
                                       if (ret == 1) {
-                                        showPiecePopUp(i, j);
+                                        showPiecePopUp(i, j, item);
                                       }
                                     },
                                     child: _buildBox(i, j, item),
@@ -131,8 +129,9 @@ class _BoardState extends State<Board> {
     );
   }
 
-  showPiecePopUp(int i, int j) async {
-    List<List<Pin>> pins = boardService.getPiecePins(i, j);
+  showPiecePopUp(int i, int j, PieceService item) async {
+    Player p = item.own$.value;
+    double size = 20;
 
     await showDialog(
       context: context,
@@ -145,36 +144,88 @@ class _BoardState extends State<Board> {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.elliptical(5, 5)),
             gradient: RadialGradient(
-              radius: 0.05,
-              colors: [Colors.transparent, Colors.red],
+              radius: 0.0,
+              colors: [
+                Colors.transparent,
+                p == Player.P1 ? Themes.p1Blue : Themes.p1Grey
+              ],
               stops: [1, 1],
             ),
           ),
-          child: Stack(
-            children: <Widget>[
-              Positioned(
-                left: 200 / 2 - 3,
-                top: 200 / 2 - 3,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(200),
-                    gradient: LinearGradient(
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
-                      stops: [0.1, 0.8],
-                      colors: [Colors.white, Colors.green],
+          child: Container(
+            margin: EdgeInsets.all(25),
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: item
+                  .getPins()
+                  .asMap()
+                  .map(
+                    (i, row) => MapEntry(
+                      i,
+                      Row(
+                        mainAxisSize: MainAxisSize.max,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: row
+                            .asMap()
+                            .map(
+                              (j, pin) => MapEntry(
+                                j,
+                                GestureDetector(
+                                  onTap: () {
+                                    print("Clicked on pin " +
+                                        i.toString() +
+                                        " " +
+                                        j.toString());
+                                    boardService.popUpOpened();
+                                    int ret = boardService.handleClick(i, j);
+                                    if (ret == 2)
+                                      Navigator.pop(context);
+                                    else if (ret == 3) {
+                                      Navigator.pop(context);
+                                      showPiecePopUp(i, j, item);
+                                    }
+                                  },
+                                  child: i == 2 && j == 2
+                                      ? Container(
+                                          width: size,
+                                          height: size,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                            color: Themes.p1Orange,
+                                          ),
+                                        )
+                                      : _buildPin(i, j, size, p, pin),
+                                ),
+                              ),
+                            )
+                            .values
+                            .toList(),
+                      ),
                     ),
-                  ),
-                  height: 5,
-                  width: 5,
-                ),
-              ),
-            ],
+                  )
+                  .values
+                  .toList(),
+            ),
           ),
         ),
       ),
     ).then((val) {
       boardService.popUpClosed();
     });
+  }
+
+  Widget _buildPin(int i, int j, double size, Player p, Pin pin) {
+    return Container(
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          color: p == Player.P1
+              ? (pin == Pin.Active ? Themes.p1PinSelected : Themes.p1PinEmpty)
+              : (pin == Pin.Active ? Themes.p2PinSelected : Themes.p2PinEmpty),
+        ));
   }
 }

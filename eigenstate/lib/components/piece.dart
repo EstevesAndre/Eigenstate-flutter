@@ -46,7 +46,14 @@ class Piece extends StatelessWidget {
                           (j, it) => MapEntry(
                             j,
                             i == 2 && j == 2
-                                ? Container()
+                                ? Container(
+                                    height: 4,
+                                    width: 4,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(4),
+                                      color: Themes.p1Orange,
+                                    ),
+                                  )
                                 : _buildPin(i, j, item.own$.value, it),
                           ),
                         )
