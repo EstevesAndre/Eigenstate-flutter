@@ -3,6 +3,8 @@ import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/pages/Home.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   setupLocator();
   runApp(MyApp());
 }
