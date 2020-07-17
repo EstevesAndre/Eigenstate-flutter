@@ -109,11 +109,12 @@ class GameState extends State<GamePage> {
                             ),
                           ),
                           Container(
-                              child: Column(
-                            mainAxisSize: MainAxisSize.max,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[Board()],
-                          )),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[Board()],
+                            ),
+                          ),
                           Container(),
                         ],
                       ),

@@ -48,7 +48,7 @@ class _BoardState extends State<Board> {
             }
           }
 
-          bool hasTransform = true;
+          final bool hasTransform = boardService.thirdDimension$.value;
 
           return Transform(
             transform: Matrix4.identity()
@@ -81,6 +81,9 @@ class _BoardState extends State<Board> {
                                       int ret = boardService.handleClick(i, j);
                                       if (ret == 1) {
                                         showPiecePopUp(i, j, item);
+                                        soundService.playSound('slide');
+                                      } else {
+                                        soundService.playSound('click');
                                       }
                                     },
                                     child: _buildBox(i, j, item),

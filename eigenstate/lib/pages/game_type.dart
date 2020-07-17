@@ -47,8 +47,7 @@ class _GameTypeState extends State<GameType> {
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
                       fontSize: 40,
-                      fontFamily: 'DancingScript'
-                  ),
+                      fontFamily: 'DancingScript'),
                 ),
               ),
               Flexible(
@@ -60,7 +59,7 @@ class _GameTypeState extends State<GameType> {
                     Btn(
                       onTap: () {
                         boardService.setGameDifficulty(Difficulty.Easy);
-//                        soundService.playSound('click');
+                        soundService.playSound('click');
 
                         Navigator.push(
                           context,
@@ -85,7 +84,7 @@ class _GameTypeState extends State<GameType> {
                     Btn(
                       onTap: () {
                         boardService.setGameDifficulty(Difficulty.Medium);
-//                        soundService.playSound('click');
+                        soundService.playSound('click');
 
                         Navigator.push(
                           context,
@@ -110,7 +109,7 @@ class _GameTypeState extends State<GameType> {
                     Btn(
                       onTap: () {
                         boardService.setGameDifficulty(Difficulty.Hard);
-//                        soundService.playSound('click');
+                        soundService.playSound('click');
 
                         Navigator.push(
                           context,
@@ -141,4 +140,3 @@ class _GameTypeState extends State<GameType> {
     );
   }
 }
-

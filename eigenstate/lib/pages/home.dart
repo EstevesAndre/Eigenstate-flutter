@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () {
-        Future.value(false);
+        return Future.value(false);
       },
       child: SafeArea(
         child: Scaffold(
@@ -81,6 +81,7 @@ class HomePage extends StatelessWidget {
                       Btn(
                         onTap: () {
                           boardService.gameMode$.add(GameMode.Solo);
+                          soundService.playSound('click');
 
                           Navigator.push(
                             context,
@@ -107,6 +108,7 @@ class HomePage extends StatelessWidget {
                           Btn(
                             onTap: () {
                               boardService.gameMode$.add(GameMode.Solo);
+                              soundService.playSound('click');
 
                               Navigator.push(
                                 context,
@@ -128,6 +130,7 @@ class HomePage extends StatelessWidget {
                           Btn(
                             onTap: () {
                               boardService.gameMode$.add(GameMode.Solo);
+                              soundService.playSound('click');
 
                               Navigator.push(
                                 context,
@@ -140,7 +143,7 @@ class HomePage extends StatelessWidget {
                             height: 50,
                             width: 50,
                             borderRadius: 25,
-                            child: Icon(Icons.ac_unit, color: Themes.p1Grey),
+                            child: Icon(Icons.help_outline, size: 40.0, color: Themes.p1Grey),
                           ),
                         ],
                       ),

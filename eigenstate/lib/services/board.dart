@@ -43,6 +43,9 @@ class BoardService {
   BehaviorSubject<MapEntry<int, int>> _score$;
   BehaviorSubject<MapEntry<int, int>> get score$ => _score$;
 
+  BehaviorSubject<bool> _thirdDimension$;
+  BehaviorSubject<bool> get thirdDimension$ => _thirdDimension$;
+
   Player _start;
   Player _second;
 
@@ -374,6 +377,8 @@ class BoardService {
     _gameDifficulty$ = BehaviorSubject<Difficulty>.seeded(Difficulty.Easy);
 
     _score$ = BehaviorSubject<MapEntry<int, int>>.seeded(MapEntry(0, 0));
+
+    _thirdDimension$ = BehaviorSubject<bool>.seeded(true);
 
     _start = Player.P1;
     _second = Player.P2;
