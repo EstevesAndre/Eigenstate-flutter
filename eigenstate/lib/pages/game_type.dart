@@ -20,6 +20,9 @@ class _GameTypeState extends State<GameType> {
 
   @override
   Widget build(BuildContext context) {
+    final bool inGame = boardService.checkGameInProgress();
+    print(inGame);
+
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -30,8 +33,8 @@ class _GameTypeState extends State<GameType> {
 //                end: Alignment.bottomCenter,
 //                stops: [0.1, 0.65],
 //                colors: [
-//                  BasicTheme.p1Grey,
-//                  BasicTheme.p1Blue,
+//                  Themes.p1Grey,
+//                  Themes.p1Blue,
 //                ],
 //              )
 //          ),
@@ -58,15 +61,20 @@ class _GameTypeState extends State<GameType> {
                   children: <Widget>[
                     Btn(
                       onTap: () {
-                        boardService.setGameDifficulty(Difficulty.Easy);
-                        soundService.playSound('click');
+                        if (inGame) {
+                          showInGamePopUp("Easy");
+                        } else {
+                          boardService.setInGame(true);
+                          boardService.setGameDifficulty(Difficulty.Easy);
+                          soundService.playSound('sounds/click');
 
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => GamePage(),
-                          ),
-                        );
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => GamePage(),
+                            ),
+                          );
+                        }
                       },
                       height: 40,
                       width: 220,
@@ -83,15 +91,20 @@ class _GameTypeState extends State<GameType> {
                     SizedBox(height: 30),
                     Btn(
                       onTap: () {
-                        boardService.setGameDifficulty(Difficulty.Medium);
-                        soundService.playSound('click');
+                        if (inGame) {
+                          showInGamePopUp("Medium");
+                        } else {
+                          boardService.setInGame(true);
+                          boardService.setGameDifficulty(Difficulty.Medium);
+                          soundService.playSound('sounds/click');
 
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => GamePage(),
-                          ),
-                        );
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => GamePage(),
+                            ),
+                          );
+                        }
                       },
                       height: 40,
                       width: 220,
@@ -108,15 +121,20 @@ class _GameTypeState extends State<GameType> {
                     SizedBox(height: 30),
                     Btn(
                       onTap: () {
-                        boardService.setGameDifficulty(Difficulty.Hard);
-                        soundService.playSound('click');
+                        if (inGame) {
+                          showInGamePopUp("Hard");
+                        } else {
+                          boardService.setInGame(true);
+                          boardService.setGameDifficulty(Difficulty.Hard);
+                          soundService.playSound('sounds/click');
 
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => GamePage(),
-                          ),
-                        );
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => GamePage(),
+                            ),
+                          );
+                        }
                       },
                       height: 40,
                       width: 220,
@@ -138,5 +156,52 @@ class _GameTypeState extends State<GameType> {
         ),
       ),
     );
+  }
+
+  showInGamePopUp(String gameType) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) => CupertinoAlertDialog(
+              title: Text("Game in progress"),
+              content: Text("Do you want to continue?"),
+              actions: <Widget>[
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: Text("No"),
+                  onPressed: () {
+                    if (gameType == "Easy")
+                      boardService.setGameDifficulty(Difficulty.Easy);
+                    else if (gameType == "Medium")
+                      boardService.setGameDifficulty(Difficulty.Medium);
+                    else if (gameType == "Hard")
+                      boardService.setGameDifficulty(Difficulty.Hard);
+
+                    boardService.resetBoard();
+                    soundService.playSound('sounds/click');
+
+                    Navigator.pushReplacement(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => GamePage(),
+                      ),
+                    );
+                  },
+                ),
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  child: Text("Yes"),
+                  onPressed: () {
+                    soundService.playSound('sounds/click');
+
+                    Navigator.pushReplacement(
+                      context,
+                      CupertinoPageRoute(
+                        builder: (context) => GamePage(),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ));
   }
 }

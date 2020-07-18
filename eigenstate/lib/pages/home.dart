@@ -81,7 +81,7 @@ class HomePage extends StatelessWidget {
                       Btn(
                         onTap: () {
                           boardService.gameMode$.add(GameMode.Solo);
-                          soundService.playSound('click');
+                          soundService.playSound('sounds/click');
 
                           Navigator.push(
                             context,
@@ -108,7 +108,7 @@ class HomePage extends StatelessWidget {
                           Btn(
                             onTap: () {
                               boardService.gameMode$.add(GameMode.Solo);
-                              soundService.playSound('click');
+                              soundService.playSound('sounds/click');
 
                               Navigator.push(
                                 context,
@@ -130,7 +130,7 @@ class HomePage extends StatelessWidget {
                           Btn(
                             onTap: () {
                               boardService.gameMode$.add(GameMode.Solo);
-                              soundService.playSound('click');
+                              soundService.playSound('sounds/click');
 
                               Navigator.push(
                                 context,

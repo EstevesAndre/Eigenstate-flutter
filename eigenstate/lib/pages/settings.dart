@@ -73,7 +73,7 @@ class SettingsPageState extends State<SettingsPage> {
                         CupertinoSwitch(
                           onChanged: (e) {
                             soundService.enableSound$.add(e);
-                            soundService.playSound('slide');
+                            soundService.playSound('sounds/slide');
                           },
                           value: isSoundEnabled,
                           activeColor: Themes.p1Orange,
@@ -96,7 +96,7 @@ class SettingsPageState extends State<SettingsPage> {
                         CupertinoSwitch(
                           onChanged: (e) {
                             boardService.thirdDimension$.add(e);
-                            soundService.playSound('slide');
+                            soundService.playSound('sounds/slide');
                           },
                           value: isThirdDimensionEnabled,
                           activeColor: Themes.p1Orange,

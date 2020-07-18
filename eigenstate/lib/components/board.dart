@@ -81,9 +81,9 @@ class _BoardState extends State<Board> {
                                       int ret = boardService.handleClick(i, j);
                                       if (ret == 1) {
                                         showPiecePopUp(i, j, item);
-                                        soundService.playSound('slide');
+                                        soundService.playSound('sounds/slide');
                                       } else {
-                                        soundService.playSound('click');
+                                        soundService.playSound('sounds/click');
                                       }
                                     },
                                     child: _buildBox(i, j, item),

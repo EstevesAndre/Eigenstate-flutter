@@ -54,6 +54,8 @@ class BoardService {
   Coordinate piece;
   int pinsSelected;
 
+  bool inGame;
+
   BoardService() {
     _initStreams();
   }
@@ -125,6 +127,8 @@ class BoardService {
       print(p);
       // TODO
       //parar o jogo.
+
+      inGame = false;
 
       return;
     }
@@ -305,11 +309,20 @@ class BoardService {
     turnPhase = Phase.ChoosePieceToMove;
     piece = Coordinate.origin();
     pinsSelected = 0;
+    inGame = true;
   }
 
   void newGame() {
     resetBoard();
     _score$.add(MapEntry(0, 0));
+  }
+
+  bool checkGameInProgress() {
+    return inGame;
+  }
+
+  void setInGame(bool b) {
+    inGame = b;
   }
 
   void _initStreams() {
@@ -385,5 +398,6 @@ class BoardService {
     turnPhase = Phase.ChoosePieceToMove;
     piece = Coordinate.origin();
     pinsSelected = 0;
+    inGame = false;
   }
 }

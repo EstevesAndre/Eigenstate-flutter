@@ -12,7 +12,7 @@ class SoundService {
     _enableSound$ = BehaviorSubject<bool>.seeded(true);
     _fixedPlayer = AudioPlayer(mode: PlayerMode.LOW_LATENCY);
     _player = AudioCache(fixedPlayer: _fixedPlayer);
-    _player.loadAll(['slide.mp3', 'click.mp3']);
+    _player.loadAll(['sounds/slide.mp3', 'sounds/click.mp3']);
   }
 
   playSound(String sound) {
