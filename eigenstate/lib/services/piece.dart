@@ -77,7 +77,7 @@ class PieceService {
   }
 
   void createPiece(int number) {
-    switch(number) {
+    switch (number) {
       case 0:
         _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
           [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
@@ -170,13 +170,91 @@ class PieceService {
         break;
       case 10:
         _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
-          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Active, Pin.Active],
-          [Pin.Active, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable, Pin.Active],
-          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable, Pin.Active],
-          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable, Pin.Active],
-          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Active, Pin.Active],
+          [
+            Pin.Disable,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active
+          ],
+          [
+            Pin.Active,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active
+          ],
+          [
+            Pin.Disable,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active
+          ],
+          [
+            Pin.Disable,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active
+          ],
+          [
+            Pin.Disable,
+            Pin.Active,
+            Pin.Disable,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active
+          ],
         ]);
         break;
+      default:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active
+          ],
+          [
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active
+          ],
+          [
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active
+          ],
+          [
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active
+          ],
+          [
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active,
+            Pin.Active
+          ],
+        ]);
     }
   }
 

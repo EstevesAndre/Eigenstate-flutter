@@ -72,9 +72,13 @@ class GameState extends State<GamePage> {
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    Text("Player 1", style: TextStyle(
-                                    color: Colors.white, fontSize: 20),),
-                                    Piece.scorePiece(50, Themes.p1Grey, p1Score, Player.P2)
+                                    Text(
+                                      "Player 1",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                    Piece.scorePiece(50, 50, Themes.p1Grey,
+                                        p1Score, Player.P2)
                                   ],
                                 ),
                               ),
@@ -84,9 +88,34 @@ class GameState extends State<GamePage> {
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Text("Turn", style: TextStyle(
-                                          color: Colors.white, fontSize: 20),),
-                                      Piece.scorePiece(50, Themes.p1Grey, round, Player.P2)
+                                      Text(
+                                        "Turn",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                                      (round ~/ 10 == 0
+                                          ? Piece.scorePiece(50, 50,
+                                              Themes.p1Grey, round, Player.P2)
+                                          : Row(
+                                              mainAxisSize: MainAxisSize.max,
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: <Widget>[
+                                                Piece.scorePiece(
+                                                    40,
+                                                    50,
+                                                    Themes.p1Grey,
+                                                    round ~/ 10,
+                                                    Player.P2),
+                                                SizedBox(width: 10),
+                                                Piece.scorePiece(
+                                                    40,
+                                                    50,
+                                                    Themes.p1Grey,
+                                                    round % 10,
+                                                    Player.P2),
+                                              ],
+                                            )),
                                     ],
                                   ),
                                 ),
@@ -98,9 +127,13 @@ class GameState extends State<GamePage> {
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    Text("Player 2", style: TextStyle(
-                                        color: Colors.white, fontSize: 20),),
-                                    Piece.scorePiece(50, Themes.p1Grey, p2Score, Player.P2)
+                                    Text(
+                                      "Player 2",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                    Piece.scorePiece(50, 50, Themes.p1Grey,
+                                        p2Score, Player.P2)
                                   ],
                                 ),
                               ),
