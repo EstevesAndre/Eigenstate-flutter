@@ -23,6 +23,11 @@ class PieceService {
     _own$ = BehaviorSubject<Player>.seeded(null);
   }
 
+  PieceService.number(int number, Player p) {
+    _own$ = BehaviorSubject<Player>.seeded(p);
+    createPiece(number);
+  }
+
   bool checkDestinationReachable(
       int positionI, int positionJ, int destinationI, int destinationJ) {
     int offsetI = destinationI - positionI;
@@ -69,6 +74,110 @@ class PieceService {
 
   bool handleInput(int i, int j) {
     return i >= size || j >= size || i < 0 || j < 0;
+  }
+
+  void createPiece(int number) {
+    switch(number) {
+      case 0:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 1:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 2:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 3:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 4:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 5:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Disable, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 6:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Disable, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 7:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 8:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 9:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Disable],
+          [Pin.Disable, Pin.Active, Pin.Active, Pin.Active, Pin.Disable]
+        ]);
+        break;
+      case 10:
+        _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Active, Pin.Active],
+          [Pin.Active, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable, Pin.Active],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable, Pin.Active],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Disable, Pin.Active],
+          [Pin.Disable, Pin.Active, Pin.Disable, Pin.Active, Pin.Active, Pin.Active],
+        ]);
+        break;
+    }
   }
 
   void _initStreams(int _id, Player _own) {

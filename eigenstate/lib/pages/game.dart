@@ -1,4 +1,5 @@
 import 'package:eigenstate/components/board.dart';
+import 'package:eigenstate/components/piece.dart';
 import 'package:eigenstate/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -67,29 +68,40 @@ class GameState extends State<GamePage> {
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  "Player 1\n      $p1Score",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text("Player 1", style: TextStyle(
+                                    color: Colors.white, fontSize: 20),),
+                                    Piece.scorePiece(50, Themes.p1Grey, p1Score, Player.P2)
+                                  ],
                                 ),
                               ),
                               Expanded(
                                 child: Container(
-                                  child: Text(
-                                    "Turn\n$round",
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.max,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text("Turn", style: TextStyle(
+                                          color: Colors.white, fontSize: 20),),
+                                      Piece.scorePiece(50, Themes.p1Grey, round, Player.P2)
+                                    ],
                                   ),
                                 ),
                               ),
                               Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 10),
-                                child: Text(
-                                  "Player 2\n      $p2Score",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    Text("Player 2", style: TextStyle(
+                                        color: Colors.white, fontSize: 20),),
+                                    Piece.scorePiece(50, Themes.p1Grey, p2Score, Player.P2)
+                                  ],
                                 ),
                               ),
                             ],
