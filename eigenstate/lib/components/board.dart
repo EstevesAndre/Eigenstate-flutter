@@ -1,7 +1,9 @@
 import 'package:eigenstate/components/piece.dart';
+import 'package:eigenstate/pages/home.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/services/board.dart';
@@ -16,12 +18,15 @@ class Board extends StatefulWidget {
   _BoardState createState() => _BoardState();
 }
 
-class _BoardState extends State<Board> {
+class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
   final boardService = locator<BoardService>();
   final alertService = locator<AlertService>();
 
   @override
   Widget build(BuildContext context) {
+    final bool hasTransform = boardService.thirdDimension$.value;
+    bool waitingForAnswer = false;
+
     return StreamBuilder<
             MapEntry<List<List<PieceService>>, MapEntry<BoardState, Player>>>(
         stream: Rx.combineLatest2(boardService.board$, boardService.boardState$,
@@ -38,17 +43,78 @@ class _BoardState extends State<Board> {
           final List<List<PieceService>> board = snapshot.data.key;
           final MapEntry<BoardState, Player> state = snapshot.data.value;
 
-          if (state.key == BoardState.EndGame) {
-            boardService.resetBoard();
+          if (state.key == BoardState.EndGame && !waitingForAnswer) {
+            waitingForAnswer = true;
+            WidgetsBinding.instance.addPostFrameCallback((_) => {
+                  Alert(
+                    context: context,
+                    title: state.value == Player.P1
+                        ? "Player 1 Won!"
+                        : "Player 2 Won!",
+                    desc: "Congratulations",
+                    style: alertService.resultAlertStyle,
+                    buttons: [
+                      DialogButton(
+                        child: Text(
+                          "No",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            stops: [0.1, 0.8],
+                            colors: [Themes.p1Grey, Themes.p1Blue]),
+                        radius: BorderRadius.circular(200),
+                        onPressed: () {
+                          boardService.newGame(false);
+                          soundService.playSound('sounds/click');
 
-            String title = 'Winner';
+                          Navigator.pop(context);
+                          Navigator.pushReplacement(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => HomePage(),
+                              ));
+                        },
+                      ),
+                      DialogButton(
+                        child: Text(
+                          "Yes",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700),
+                        ),
+                        gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            stops: [0.1, 0.8],
+                            colors: [Themes.p1Grey, Themes.p1Blue]),
+                        radius: BorderRadius.circular(200),
+                        onPressed: () {
+                          boardService.resetBoard(true);
+                          soundService.playSound('sounds/click');
 
-            if (state.value == null) {
-              title = "Draw";
-            }
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                    content: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
+                      child: Text(
+                        "Do you want to continue?",
+                        style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ).show()
+                });
           }
-
-          final bool hasTransform = boardService.thirdDimension$.value;
 
           return Transform(
             transform: Matrix4.identity()
@@ -81,9 +147,6 @@ class _BoardState extends State<Board> {
                                       int ret = boardService.handleClick(i, j);
                                       if (ret == 1) {
                                         showPiecePopUp(i, j, item);
-                                        soundService.playSound('sounds/slide');
-                                      } else {
-                                        soundService.playSound('sounds/click');
                                       }
                                     },
                                     child: _buildBox(i, j, item),
@@ -114,22 +177,48 @@ class _BoardState extends State<Board> {
         left: j == 0 ? borderStyle : BorderSide.none,
         right: borderStyle);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Themes.p1Orange,
-        border: border,
-      ),
-      height: size,
-      width: size,
-      child: Center(
-        child: item.own$.value == null
-            ? null
-            : Piece(
-                size * 5 / 6,
-                item.own$.value == Player.P1 ? Themes.p1Blue : Themes.p1Grey,
-                item),
+    return AnimatedSwitcher(
+      duration: Duration(seconds: 1),
+      child: Container(
+        key: ValueKey<int>(
+            item.pieceMoved$.value ? i * 6 + j * 2 + 1 : i * 6 + j),
+        decoration: BoxDecoration(
+          color: (i + j) % 2 == 0 ? Themes.p1Orange : Themes.p1Orange2,
+          border: border,
+        ),
+        height: size,
+        width: size,
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 750),
+          color: item.toAnimate$.value
+              ? Colors.lightGreenAccent
+              : Colors.transparent,
+          curve: Curves.ease,
+          child: Center(
+            child: item.own$.value == null
+                ? null
+                : Piece(
+                    size * 5 / 6,
+                    item.own$.value == Player.P1
+                        ? Themes.p1Blue
+                        : Themes.p1Grey,
+                    item),
+          ),
+        ),
       ),
     );
+  }
+
+  Widget _buildPin(int i, int j, double size, Player p, Pin pin) {
+    return Container(
+        height: size,
+        width: size,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          color: p == Player.P1
+              ? (pin == Pin.Active ? Themes.p1PinSelected : Themes.p1PinEmpty)
+              : (pin == Pin.Active ? Themes.p2PinSelected : Themes.p2PinEmpty),
+        ));
   }
 
   showPiecePopUp(int i, int j, PieceService item) async {
@@ -154,6 +243,12 @@ class _BoardState extends State<Board> {
               ],
               stops: [1, 1],
             ),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                  color: p == Player.P2 ? Themes.p1Blue : Themes.p1Grey,
+                  spreadRadius: 5.0,
+                  offset: Offset(5.0, 5.0))
+            ],
           ),
           child: Container(
             margin: EdgeInsets.all(25),
@@ -218,17 +313,5 @@ class _BoardState extends State<Board> {
     ).then((val) {
       boardService.popUpClosed();
     });
-  }
-
-  Widget _buildPin(int i, int j, double size, Player p, Pin pin) {
-    return Container(
-        height: size,
-        width: size,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: p == Player.P1
-              ? (pin == Pin.Active ? Themes.p1PinSelected : Themes.p1PinEmpty)
-              : (pin == Pin.Active ? Themes.p2PinSelected : Themes.p2PinEmpty),
-        ));
   }
 }

@@ -35,9 +35,11 @@ class GameState extends State<GamePage> {
             final int p2Score = snapshot.data.key.value;
 //                final String mode = boardService.getGameDifficulty();
             final int round = snapshot.data.value.key;
+            final int onPlayerSwitch = snapshot.data.value.value.index + 1;
+//            final int angleCondition = snapshot.data.value.value.index;
             final String playing = snapshot.data.value.value == Player.P1
-                ? "Player 1"
-                : "Player 2";
+                ? "Your turn"
+                : "AI turn";
 
             return Container(
               width: MediaQuery.of(context).size.width,
@@ -72,13 +74,26 @@ class GameState extends State<GamePage> {
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    Text(
-                                      "Player 1",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
+                                    Container(
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                                      child: Text(
+                                        "Player 1",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
                                     ),
-                                    Piece.scorePiece(50, 50, Themes.p1Grey,
-                                        p1Score, Player.P2)
+                                    AnimatedSwitcher(
+                                      duration: Duration(seconds: 1),
+                                      transitionBuilder: (Widget child,
+                                              Animation<double> animation) =>
+                                          RotationTransition(
+                                              turns: animation, child: child),
+                                      child: Container(
+                                        key: ValueKey<int>(p1Score + 1),
+                                        child: Piece.scorePiece(50, 50,
+                                            Themes.p1Grey, p1Score, Player.P2),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -88,34 +103,54 @@ class GameState extends State<GamePage> {
                                     mainAxisSize: MainAxisSize.max,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: <Widget>[
-                                      Text(
-                                        "Turn",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 20),
+                                      Container(
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 0, 0, 15),
+                                        child: Text(
+                                          "Turn",
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 20),
+                                        ),
                                       ),
-                                      (round ~/ 10 == 0
-                                          ? Piece.scorePiece(50, 50,
-                                              Themes.p1Grey, round, Player.P2)
-                                          : Row(
-                                              mainAxisSize: MainAxisSize.max,
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                Piece.scorePiece(
-                                                    40,
+                                      AnimatedSwitcher(
+                                        duration: Duration(seconds: 1),
+                                        transitionBuilder: (Widget child,
+                                                Animation<double> animation) =>
+                                            RotationTransition(
+                                                turns: animation, child: child),
+                                        child: (round ~/ 10 == 0
+                                            ? Container(
+                                                key: ValueKey<int>(round),
+                                                child: Piece.scorePiece(
+                                                    50,
                                                     50,
                                                     Themes.p1Grey,
-                                                    round ~/ 10,
+                                                    round,
                                                     Player.P2),
-                                                SizedBox(width: 10),
-                                                Piece.scorePiece(
-                                                    40,
-                                                    50,
-                                                    Themes.p1Grey,
-                                                    round % 10,
-                                                    Player.P2),
-                                              ],
-                                            )),
+                                              )
+                                            : Row(
+                                                key: ValueKey<int>(round),
+                                                mainAxisSize: MainAxisSize.max,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Piece.scorePiece(
+                                                      40,
+                                                      50,
+                                                      Themes.p1Grey,
+                                                      round ~/ 10,
+                                                      Player.P2),
+                                                  SizedBox(width: 10),
+                                                  Piece.scorePiece(
+                                                      40,
+                                                      50,
+                                                      Themes.p1Grey,
+                                                      round % 10,
+                                                      Player.P2),
+                                                ],
+                                              )),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -127,32 +162,68 @@ class GameState extends State<GamePage> {
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    Text(
-                                      "Player 2",
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
+                                    Container(
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                                      child: Text(
+                                        "Player 2",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
                                     ),
-                                    Piece.scorePiece(50, 50, Themes.p1Grey,
-                                        p2Score, Player.P2)
+                                    AnimatedSwitcher(
+                                      duration: Duration(seconds: 1),
+                                      transitionBuilder: (Widget child,
+                                              Animation<double> animation) =>
+                                          RotationTransition(
+                                              turns: animation, child: child),
+                                      child: Container(
+                                        key: ValueKey<int>(p2Score + 1),
+                                        child: Piece.scorePiece(50, 50,
+                                            Themes.p1Grey, p2Score, Player.P2),
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Container(
-                          child: Text(
-                            playing,
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                        AnimatedSwitcher(
+                          duration: Duration(milliseconds: 750),
+                          transitionBuilder:
+                              (Widget child, Animation<double> animation) =>
+                                  SlideTransition(
+                                      position: Tween<Offset>(
+                                        begin: Offset(0.0, 4.0),
+                                        end: Offset.zero,
+                                      ).animate(animation),
+                                      child: child),
+                          child: Container(
+                            key: ValueKey<int>(onPlayerSwitch),
+                            child: Text(
+                              playing,
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 20),
+                            ),
                           ),
                         ),
+//                        AnimatedSwitcher(
+//                          duration: Duration(seconds: 1),
+//                          transitionBuilder: (Widget child, Animation<double> animation ) =>
+//                            RotatedBox(
+//                              quarterTurns: 2 * angleCondition,
+//                              child: child
+//                            ),
+//                          child:
                         Container(
+//                          key: ValueKey<int>(onPlayerSwitch),
                           child: Column(
                             mainAxisSize: MainAxisSize.max,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[Board()],
                           ),
                         ),
+//                        ),
                         Container(),
                       ],
                     ),

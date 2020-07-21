@@ -15,17 +15,28 @@ class PieceService {
   BehaviorSubject<List<List<Pin>>> _piece$;
   BehaviorSubject<List<List<Pin>>> get piece$ => _piece$;
 
-  PieceService(int _id, Player _own) {
-    _initStreams(_id, _own);
+  BehaviorSubject<bool> _toAnimate$;
+  BehaviorSubject<bool> get toAnimate$ => _toAnimate$;
+
+  BehaviorSubject<bool> _pieceMoved$;
+  BehaviorSubject<bool> get pieceMoved$ => _pieceMoved$;
+
+
+  PieceService(int _id, Player _own, bool _toAnimate) {
+    _initStreams(_id, _own, _toAnimate);
   }
 
   PieceService.empty() {
     _own$ = BehaviorSubject<Player>.seeded(null);
+    _toAnimate$ = BehaviorSubject<bool>.seeded(false);
+    _pieceMoved$ = BehaviorSubject<bool>.seeded(false);
   }
 
   PieceService.number(int number, Player p) {
     _own$ = BehaviorSubject<Player>.seeded(p);
     createPiece(number);
+    _toAnimate$ = BehaviorSubject<bool>.seeded(false);
+    _pieceMoved$ = BehaviorSubject<bool>.seeded(false);
   }
 
   bool checkDestinationReachable(
@@ -258,7 +269,7 @@ class PieceService {
     }
   }
 
-  void _initStreams(int _id, Player _own) {
+  void _initStreams(int _id, Player _own, bool _toAnimate) {
     _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
       [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Disable, Pin.Disable],
       [
@@ -282,5 +293,8 @@ class PieceService {
     _id$ = BehaviorSubject<int>.seeded(_id);
 
     _own$ = BehaviorSubject<Player>.seeded(_own);
+
+    _toAnimate$ = BehaviorSubject<bool>.seeded(_toAnimate);
+    _pieceMoved$ = BehaviorSubject<bool>.seeded(false);
   }
 }

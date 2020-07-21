@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 
 import 'package:eigenstate/services/board.dart';
 import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/services/sound.dart';
+import 'package:eigenstate/services/alert.dart';
 
 import 'package:eigenstate/components/Btn.dart';
 
@@ -17,6 +19,7 @@ class GameType extends StatefulWidget {
 class _GameTypeState extends State<GameType> {
   final boardService = locator<BoardService>();
   final soundService = locator<SoundService>();
+  final alertService = locator<AlertService>();
 
   @override
   Widget build(BuildContext context) {
@@ -159,49 +162,74 @@ class _GameTypeState extends State<GameType> {
   }
 
   showInGamePopUp(String gameType) {
-    showDialog(
+      Alert(
         context: context,
-        builder: (BuildContext context) => CupertinoAlertDialog(
-              title: Text("Game in progress"),
-              content: Text("Do you want to continue?"),
-              actions: <Widget>[
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: Text("No"),
-                  onPressed: () {
-                    if (gameType == "Easy")
-                      boardService.setGameDifficulty(Difficulty.Easy);
-                    else if (gameType == "Medium")
-                      boardService.setGameDifficulty(Difficulty.Medium);
-                    else if (gameType == "Hard")
-                      boardService.setGameDifficulty(Difficulty.Hard);
+        title: "Game in progress",
+        style: alertService.resultAlertStyle,
+        buttons: [
+          DialogButton(
+            child: Text(
+              "No",
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+            ),
+            gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                stops: [0.1, 0.8],
+                colors: [Themes.p1Grey, Themes.p1Blue]
+            ),
+            radius: BorderRadius.circular(200),
+            onPressed: () {
+              if (gameType == "Easy")
+                boardService.setGameDifficulty(Difficulty.Easy);
+              else if (gameType == "Medium")
+                boardService.setGameDifficulty(Difficulty.Medium);
+              else if (gameType == "Hard")
+                boardService.setGameDifficulty(Difficulty.Hard);
 
-                    boardService.resetBoard();
-                    soundService.playSound('sounds/click');
+              boardService.newGame(true);
+              soundService.playSound('sounds/click');
 
-                    Navigator.pushReplacement(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => GamePage(),
-                      ),
-                    );
-                  },
+              Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => GamePage(),
                 ),
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  child: Text("Yes"),
-                  onPressed: () {
-                    soundService.playSound('sounds/click');
+              );
+            },
+          ),
+          DialogButton(
+            child: Text(
+              "Yes",
+              style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+            ),
+            gradient: LinearGradient(
+                begin: Alignment.centerLeft,
+                end: Alignment.centerRight,
+                stops: [0.1, 0.8],
+                colors: [Themes.p1Grey, Themes.p1Blue]
+            ),
+            radius: BorderRadius.circular(200),
+            onPressed: () {
+              soundService.playSound('sounds/click');
 
-                    Navigator.pushReplacement(
-                      context,
-                      CupertinoPageRoute(
-                        builder: (context) => GamePage(),
-                      ),
-                    );
-                  },
+              Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => GamePage(),
                 ),
-              ],
-            ));
+              );
+            },
+          ),
+        ],
+        content: Padding(
+          padding:
+          EdgeInsets.fromLTRB(10, 30, 10, 10),
+          child: Text(
+            "Do you want to continue?",
+            style: TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+          ),
+        ),
+      ).show();
   }
 }

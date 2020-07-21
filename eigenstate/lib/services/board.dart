@@ -122,14 +122,17 @@ class BoardService {
   void nextTurn() {
     Player p = checkWinner();
 
-    if (p != null) {
+    if (p != null && inGame) {
       print("GANHOUU");
       print(p);
-      // TODO
-      //parar o jogo.
 
+      if (p == Player.P1)
+        _score$.add(MapEntry(score$.value.key + 1, score$.value.value));
+      else
+        _score$.add(MapEntry(score$.value.key, score$.value.value + 1));
+
+      _boardState$.add(MapEntry(BoardState.EndGame, p));
       inGame = false;
-
       return;
     }
 
@@ -146,7 +149,44 @@ class BoardService {
 
     turnPhase = Phase.ChoosePieceToMove;
     piece.clean();
+    swapPieceAnimation();
     pinsSelected = 0;
+  }
+
+  void swapPieceAnimation() {
+    Player p = getPlaying();
+
+    List<List<PieceService>> currentBoard = _board$.value;
+
+    currentBoard.forEach((line) => line.forEach((piece) => piece.own$.value == p
+        ? piece.toAnimate$.add(!piece.toAnimate$.value)
+        : null));
+
+    _board$.add(currentBoard);
+  }
+
+  void changePossiblePieceDestinations(bool toValue) {
+    List<List<PieceService>> currentBoard = _board$.value;
+
+    PieceService p = currentBoard[piece.getI()][piece.getJ()];
+
+    for (var i = 0; i < size; i++) {
+      for (var j = 0; j < size; j++) {
+        if (p.checkDestinationReachable(piece.getI(), piece.getJ(), i, j))
+          currentBoard[i][j].toAnimate$.add(toValue);
+      }
+    }
+
+    _board$.add(currentBoard);
+  }
+
+  void disablePieceMove() {
+    List<List<PieceService>> currentBoard = _board$.value;
+
+    currentBoard.forEach(
+        (line) => line.forEach((piece) => piece.pieceMoved$.value = false));
+
+    _board$.add(currentBoard);
   }
 
   int handleClick(int i, int j) {
@@ -157,18 +197,29 @@ class BoardService {
         if (checkPiece(i, j)) {
           turnPhase = Phase.Destination;
           piece.setCoordinates(i, j);
+          swapPieceAnimation(); // remove
+          changePossiblePieceDestinations(true);
         }
         break;
       case Phase.Destination:
         if (checkDestination(i, j)) {
+          changePossiblePieceDestinations(false);
           executeMove(i, j);
           turnPhase = Phase.ChoosePieceToPin;
+
+          if (checkWinner() != null) {
+            nextTurn();
+          }
+
+          swapPieceAnimation(); // put
         }
         break;
       case Phase.ChoosePieceToPin:
+        disablePieceMove();
         if (checkPiece(i, j)) {
           turnPhase = Phase.ChoosePins;
           piece.setCoordinates(i, j);
+          soundService.playSound('sounds/slide');
           return 1;
         }
         break;
@@ -179,16 +230,15 @@ class BoardService {
           currentBoard[piece.getI()][piece.getJ()].addPin(i, j);
           _board$.add(currentBoard);
 
-          if (pinsSelected == 2)
+          if (pinsSelected == 2) {
+            swapPieceAnimation(); // remove
             return 2; // finish phase
-          else
+          } else
             return 3; // alert dialog change
         }
         break;
       default:
     }
-
-    print(turnPhase);
 
     if (turnPhase == Phase.Done) nextTurn();
 
@@ -209,7 +259,9 @@ class BoardService {
     List<List<PieceService>> currentBoard = _board$.value;
 
     if (currentBoard[i][j].own$.value == getPlaying()) {
+      changePossiblePieceDestinations(false);
       piece.setCoordinates(i, j);
+      changePossiblePieceDestinations(true);
       return false;
     }
 
@@ -221,7 +273,9 @@ class BoardService {
     List<List<PieceService>> currentBoard = _board$.value;
 
     currentBoard[i][j] = currentBoard[piece.getI()][piece.getJ()];
+    currentBoard[i][j].pieceMoved$.add(true);
     currentBoard[piece.getI()][piece.getJ()] = PieceService.empty();
+    currentBoard[piece.getI()][piece.getJ()].pieceMoved$.add(true);
 
     _board$.add(currentBoard);
 
@@ -247,73 +301,73 @@ class BoardService {
     turnPhase = Phase.ChoosePins;
   }
 
-  void resetBoard() {
+  void resetBoard(bool start) {
     print("Reset Board\n");
-
-    _board$.add([
-      [
-        PieceService(6, Player.P2),
-        PieceService(5, Player.P2),
-        PieceService(4, Player.P2),
-        PieceService(3, Player.P2),
-        PieceService(2, Player.P2),
-        PieceService(1, Player.P2)
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService(1, Player.P1),
-        PieceService(2, Player.P1),
-        PieceService(3, Player.P1),
-        PieceService(4, Player.P1),
-        PieceService(5, Player.P1),
-        PieceService(6, Player.P1)
-      ]
-    ]);
 
     setPlayerStart();
     _rounds$.add(MapEntry(1, _start));
+
+    _board$.add([
+      [
+        PieceService(6, Player.P2, Player.P2 == _start),
+        PieceService(5, Player.P2, Player.P2 == _start),
+        PieceService(4, Player.P2, Player.P2 == _start),
+        PieceService(3, Player.P2, Player.P2 == _start),
+        PieceService(2, Player.P2, Player.P2 == _start),
+        PieceService(1, Player.P2, Player.P2 == _start)
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService(1, Player.P1, Player.P1 == _start),
+        PieceService(2, Player.P1, Player.P1 == _start),
+        PieceService(3, Player.P1, Player.P1 == _start),
+        PieceService(4, Player.P1, Player.P1 == _start),
+        PieceService(5, Player.P1, Player.P1 == _start),
+        PieceService(6, Player.P1, Player.P1 == _start)
+      ]
+    ]);
 
     _boardState$.add(MapEntry(BoardState.Play, null));
 
     turnPhase = Phase.ChoosePieceToMove;
     piece = Coordinate.origin();
     pinsSelected = 0;
-    inGame = true;
+    inGame = start;
   }
 
-  void newGame() {
-    resetBoard();
+  void newGame(bool start) {
+    resetBoard(start);
     _score$.add(MapEntry(0, 0));
   }
 
@@ -328,14 +382,17 @@ class BoardService {
   void _initStreams() {
     print("Initiate Streams\n");
 
+    _start = Player.P1;
+    _second = Player.P2;
+
     _board$ = BehaviorSubject<List<List<PieceService>>>.seeded([
       [
-        PieceService(6, Player.P2),
-        PieceService(5, Player.P2),
-        PieceService(4, Player.P2),
-        PieceService(3, Player.P2),
-        PieceService(2, Player.P2),
-        PieceService(1, Player.P2)
+        PieceService(6, Player.P2, Player.P2 == _start),
+        PieceService(5, Player.P2, Player.P2 == _start),
+        PieceService(4, Player.P2, Player.P2 == _start),
+        PieceService(3, Player.P2, Player.P2 == _start),
+        PieceService(2, Player.P2, Player.P2 == _start),
+        PieceService(1, Player.P2, Player.P2 == _start)
       ],
       [
         PieceService.empty(),
@@ -370,12 +427,12 @@ class BoardService {
         PieceService.empty()
       ],
       [
-        PieceService(1, Player.P1),
-        PieceService(2, Player.P1),
-        PieceService(3, Player.P1),
-        PieceService(4, Player.P1),
-        PieceService(5, Player.P1),
-        PieceService(6, Player.P1)
+        PieceService(1, Player.P1, Player.P1 == _start),
+        PieceService(2, Player.P1, Player.P1 == _start),
+        PieceService(3, Player.P1, Player.P1 == _start),
+        PieceService(4, Player.P1, Player.P1 == _start),
+        PieceService(5, Player.P1, Player.P1 == _start),
+        PieceService(6, Player.P1, Player.P1 == _start)
       ]
     ]);
 
@@ -393,8 +450,6 @@ class BoardService {
 
     _thirdDimension$ = BehaviorSubject<bool>.seeded(true);
 
-    _start = Player.P1;
-    _second = Player.P2;
     turnPhase = Phase.ChoosePieceToMove;
     piece = Coordinate.origin();
     pinsSelected = 0;
