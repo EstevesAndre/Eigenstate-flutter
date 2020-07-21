@@ -20,7 +20,7 @@ class AlertService {
       descStyle: TextStyle(fontSize: 17, color: Colors.black87),
       animationDuration: Duration(milliseconds: 1000),
       buttonAreaPadding: EdgeInsets.all(12),
-      overlayColor: Colors.black.withOpacity(.2),
+      overlayColor: Colors.black.withOpacity(.7),
       alertBorder: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),

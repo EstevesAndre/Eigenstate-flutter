@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "260574997587",
+    "firebase_url": "https://eigenstate-f8671.firebaseio.com",
+    "project_id": "eigenstate-f8671",
+    "storage_bucket": "eigenstate-f8671.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:260574997587:android:2348a60564c340ca986aa6",
+        "android_client_info": {
+          "package_name": "com.boardzoid.eigenstate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "260574997587-gtnv2fcggr2c24jal9vbho1ia0p1ctmc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbVz8coCzxb-M8mXX4vlFJ_YWXHmJyku0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "260574997587-gtnv2fcggr2c24jal9vbho1ia0p1ctmc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
