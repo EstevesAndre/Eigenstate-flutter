@@ -1,3 +1,4 @@
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:eigenstate/components/piece.dart';
 import 'package:eigenstate/pages/home.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +10,7 @@ import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/services/board.dart';
 import 'package:eigenstate/services/alert.dart';
 import 'package:eigenstate/services/piece.dart';
+import 'package:eigenstate/services/admob.dart';
 
 import 'package:eigenstate/theme/theme.dart';
 
@@ -19,12 +21,78 @@ class Board extends StatefulWidget {
 }
 
 class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
+  GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
+
+  final debugMode = true;
   final boardService = locator<BoardService>();
   final alertService = locator<AlertService>();
+  final adMobService = locator<AdMobService>();
+  AdmobInterstitial interstitialAd;
+  AdmobReward rewardAd;
+
+  @override
+  void initState() {
+    super.initState();
+
+    interstitialAd = AdmobInterstitial(
+        adUnitId: adMobService.getInterstitialAdId(),
+        listener: (AdmobAdEvent event, Map<String, dynamic> args) {
+          if (event == AdmobAdEvent.closed) interstitialAd.load();
+          if (debugMode) handleEvent(event, args, 'Interstitial');
+        });
+
+    rewardAd = AdmobReward(
+        adUnitId: adMobService.getRewardAdId(),
+        listener: (AdmobAdEvent event, Map<String, dynamic> args) {
+          if (event == AdmobAdEvent.closed) rewardAd.load();
+          if (debugMode) handleEvent(event, args, 'Reward');
+        });
+
+    interstitialAd.load();
+    rewardAd.load();
+  }
+
+  @override
+  void dispose() {
+    interstitialAd.dispose();
+    rewardAd.dispose();
+    super.dispose();
+  }
+
+  void handleEvent(
+      AdmobAdEvent event, Map<String, dynamic> args, String adType) {
+    switch (event) {
+      case AdmobAdEvent.loaded:
+        showSnackBar('New Admob $adType Ad loaded!');
+        break;
+      case AdmobAdEvent.opened:
+        showSnackBar('Admob $adType Ad opened!');
+        break;
+      case AdmobAdEvent.closed:
+        showSnackBar('Admob $adType Ad closed!');
+        break;
+      case AdmobAdEvent.failedToLoad:
+        showSnackBar('Admob $adType failed to load. :(');
+        break;
+      case AdmobAdEvent.rewarded:
+        print("HEREEE");
+        // TODO add coins to "store"
+        break;
+      default:
+    }
+  }
+
+  void showSnackBar(String content) {
+    scaffoldState.currentState.showSnackBar(SnackBar(
+      content: Text(content),
+      duration: Duration(milliseconds: 1500),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
     final bool hasTransform = boardService.thirdDimension$.value;
+    final GameMode gameMode = boardService.getGameMode();
     bool waitingForAnswer = false;
 
     return StreamBuilder<
@@ -45,81 +113,53 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
 
           if (state.key == BoardState.EndGame && !waitingForAnswer) {
             waitingForAnswer = true;
-            WidgetsBinding.instance.addPostFrameCallback((_) => {
-                  Alert(
-                    context: context,
-                    title: state.value == Player.P1
-                        ? "Player 1 Won!"
-                        : "Player 2 Won!",
-                    desc: "Congratulations",
-                    style: alertService.resultAlertStyle,
-                    buttons: [
-                      DialogButton(
+            WidgetsBinding.instance.addPostFrameCallback((_) => Future.delayed(
+                const Duration(seconds: 1),
+                () => Alert(
+                      context: context,
+                      title: state.value == Player.P1
+                          ? "Player 1 Won!"
+                          : "Player 2 Won!",
+                      style: alertService.resultAlertStyle,
+                      type: AlertType.success,
+                      buttons: [
+                        DialogButton(
+                          child: Text(
+                            "Continue".toUpperCase(),
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          gradient: LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              stops: [0.1, 0.8],
+                              colors: [Themes.p1Grey, Themes.p1Blue]),
+                          radius: BorderRadius.circular(200),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            showRewardDialog();
+                          },
+                        )
+                      ],
+                      content: Padding(
+                        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
                         child: Text(
-                          "No",
+                          "Congratulations",
                           style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700),
+                              color: Colors.black87,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500),
                         ),
-                        gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            stops: [0.1, 0.8],
-                            colors: [Themes.p1Grey, Themes.p1Blue]),
-                        radius: BorderRadius.circular(200),
-                        onPressed: () {
-                          boardService.newGame(false);
-                          soundService.playSound('sounds/click');
-
-                          Navigator.pop(context);
-                          Navigator.pushReplacement(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => HomePage(),
-                              ));
-                        },
                       ),
-                      DialogButton(
-                        child: Text(
-                          "Yes",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700),
-                        ),
-                        gradient: LinearGradient(
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                            stops: [0.1, 0.8],
-                            colors: [Themes.p1Grey, Themes.p1Blue]),
-                        radius: BorderRadius.circular(200),
-                        onPressed: () {
-                          boardService.resetBoard(true);
-                          soundService.playSound('sounds/click');
-
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                    content: Padding(
-                      padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
-                      child: Text(
-                        "Do you want to continue?",
-                        style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                  ).show()
-                });
+                    ).show()));
           }
 
           return Transform(
             transform: Matrix4.identity()
-              ..setEntry(3, 2, hasTransform ? 0.07 : 0.0)
-              ..rotateX(hasTransform ? -0.01 : 0.0),
+              ..setEntry(3, 2, hasTransform && gameMode != GameMode.TwoPlayers ? 0.07 : 0.0)
+              ..rotateX(hasTransform && gameMode != GameMode.TwoPlayers ? -0.01 : 0.0),
             alignment: FractionalOffset.center,
             child: Container(
               child: Column(
@@ -134,6 +174,7 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
                           mainAxisSize: MainAxisSize.min,
                           children: row
                               .asMap()
+
                               .map(
                                 (j, item) => MapEntry(
                                   j,
@@ -313,5 +354,133 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
     ).then((val) {
       boardService.popUpClosed();
     });
+  }
+
+  showRewardDialog() async {
+    Alert(
+      context: context,
+      title: "Nice job",
+      type: AlertType.success,
+      style: alertService.resultAlertStyle,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "+ 40",
+            style: TextStyle(
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: [0.1, 0.8],
+              colors: [Themes.p1Grey, Themes.p1Blue]),
+          radius: BorderRadius.circular(200),
+          onPressed: () async {
+            soundService.playSound('sounds/click');
+            Navigator.pop(context);
+
+            if (await interstitialAd.isLoaded) {
+              interstitialAd.show();
+              showEndGamePopUp();
+            } else {
+              showSnackBar("Interstitial ad is still loading...");
+            }
+          },
+        ),
+        DialogButton(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Icon(Icons.ondemand_video, color: Colors.white),
+              Text(
+                "+ 120",
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: [0.1, 0.8],
+              colors: [Themes.p1Grey, Themes.p1Blue]),
+          radius: BorderRadius.circular(200),
+          onPressed: () async {
+            soundService.playSound('sounds/click');
+            Navigator.pop(context);
+
+            if (await rewardAd.isLoaded) {
+              rewardAd.show();
+              showEndGamePopUp();
+            } else {
+              showSnackBar("Reward ad is still loading...");
+            }
+          },
+        ),
+      ],
+      content: Padding(
+        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
+        child: Text(
+          "Get a reward",
+          style: TextStyle(
+              color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+      ),
+    ).show();
+  }
+
+  showEndGamePopUp() {
+    Alert(
+      context: context,
+      title: "Nice job",
+      desc: "Do you want to continue?",
+      type: AlertType.info,
+      style: alertService.resultAlertStyle,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "No",
+            style: TextStyle(
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: [0.1, 0.8],
+              colors: [Themes.p1Grey, Themes.p1Blue]),
+          radius: BorderRadius.circular(200),
+          onPressed: () {
+            boardService.newGame(false);
+            soundService.playSound('sounds/click');
+            Navigator.pop(context);
+            Navigator.pushReplacement(
+                context,
+                CupertinoPageRoute(
+                  builder: (context) => HomePage(),
+                ));
+          },
+        ),
+        DialogButton(
+          child: Text(
+            "Yes",
+            style: TextStyle(
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: [0.1, 0.8],
+              colors: [Themes.p1Grey, Themes.p1Blue]),
+          radius: BorderRadius.circular(200),
+          onPressed: () {
+            soundService.playSound('sounds/click');
+            boardService.resetBoard(true);
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    ).show();
   }
 }
