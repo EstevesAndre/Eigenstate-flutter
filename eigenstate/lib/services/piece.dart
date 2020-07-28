@@ -58,6 +58,20 @@ class PieceService {
     return _piece$.value;
   }
 
+  bool hasPossibleMovements(int k, int l, int s) {
+    bool isPossible = false;
+
+    for (var i = 0; i < s; i++) {
+      for (var j = 0; j < s; j++) {
+        if (checkDestinationReachable(k, l, i, j))
+          isPossible = true;
+      }
+    }
+
+    print("piece " + k.toString() + ":" + l.toString() + " = " + (isPossible ? "True" : "FALSE"));
+    return isPossible;
+  }
+
   bool checkFullPin() {
     bool isFull = true;
 
@@ -279,7 +293,7 @@ class PieceService {
         Pin.Disable,
         Pin.Disable
       ],
-      [Pin.Disable, Pin.Disable, Pin.Center, Pin.Disable, Pin.Disable],
+      [Pin.Disable, Pin.Disable, Pin.Center, Pin.Active, Pin.Disable],
       [
         Pin.Disable,
         Pin.Disable,

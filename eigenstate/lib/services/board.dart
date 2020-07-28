@@ -1,6 +1,5 @@
-import 'dart:math';
-
 import 'package:eigenstate/components/piece.dart';
+import 'dart:math';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:eigenstate/services/provider.dart';
@@ -12,7 +11,7 @@ final soundService = locator<SoundService>();
 
 enum Player { P1, P2 }
 enum BoardState { EndGame, Play }
-enum GameMode { Solo }
+enum GameMode { Solo, Online, TwoPlayers }
 enum Difficulty { Easy, Medium, Hard }
 enum Phase {
   ChoosePieceToMove,
@@ -56,6 +55,8 @@ class BoardService {
 
   bool inGame;
 
+  final random = Random();
+
   BoardService() {
     _initStreams();
   }
@@ -77,6 +78,10 @@ class BoardService {
     _gameDifficulty$.add(difficulty);
   }
 
+  void setGameMode(GameMode gm) {
+    _gameMode$.add(gm);
+  }
+
   void setPlayerStart() {
     if (_start == Player.P1) {
       _start = Player.P2;
@@ -89,6 +94,10 @@ class BoardService {
 
   Player getPlaying() {
     return _rounds$.value.value;
+  }
+
+  GameMode getGameMode() {
+    return _gameMode$.value;
   }
 
   Player checkWinner() {
@@ -149,8 +158,315 @@ class BoardService {
 
     turnPhase = Phase.ChoosePieceToMove;
     piece.clean();
-    swapPieceAnimation();
     pinsSelected = 0;
+
+    if (!(gameMode$.value != GameMode.TwoPlayers &&
+        getPlaying() == Player.P2)) {
+      swapPieceAnimation();
+    } else {
+      performAITurn();
+    }
+  }
+
+  void performAITurn() {
+    // Move piece
+    moveAIPiece();
+    // Choose two pins
+    chooseAITwoPins();
+
+    nextTurn();
+  }
+
+  void moveAIPiece() {
+    switch (gameDifficulty$.value) {
+      case Difficulty.Easy:
+        if (captureMove(false)) return;
+        randomAIMove();
+        break;
+      case Difficulty.Medium:
+        if (captureMove(true)) return;
+        if (moveDangerousPieces()) return;
+        carefulMove();
+        break;
+      case Difficulty.Hard:
+        // TODO predicts player move to play to counter
+        if (captureMove(true)) return;
+        if (moveDangerousPieces()) return;
+        carefulMove();
+        break;
+      default:
+    }
+  }
+
+  bool captureMove(bool precation) {
+    if (random.nextBool()) {
+      for (var i = 0; i < size; i++) {
+        for (var j = 0; j < size; j++) {
+          if (checkPossibleMoveAI(i, j, precation)) {
+            return true;
+          }
+        }
+      }
+    } else {
+      for (var i = size - 1; i >= 0; i--) {
+        for (var j = size - 1; j >= 0; j--) {
+          if (checkPossibleMoveAI(i, j, precation)) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  bool checkPossibleMoveAI(int i, int j, bool precation) {
+    List<List<PieceService>> currentBoard = _board$.value;
+    Player player = getPlaying();
+    PieceService p = currentBoard[i][j];
+
+    if (p.own$.value == player) {
+      for (var k = 0; k < size; k++) {
+        for (var l = 0; l < size; l++) {
+          if (currentBoard[k][l].own$.value == Player.P1 &&
+              p.checkDestinationReachable(i, j, k, l)) {
+            if (precation && !checkPositionDangerous(i, j, Player.P1)) {
+              if (checkPositionDangerous(k, l, Player.P1)) {
+                continue;
+              }
+            }
+            print("Capture: Piece " +
+                i.toString() +
+                ":" +
+                j.toString() +
+                " to " +
+                k.toString() +
+                ":" +
+                l.toString());
+            piece.setCoordinates(i, j);
+            executeMove(k, l);
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  bool checkPositionDangerous(int k, int l, Player p) {
+    List<List<PieceService>> currentBoard = _board$.value;
+
+    for (var i = 0; i < size; i++) {
+      for (var j = 0; j < size; j++) {
+        PieceService piece = currentBoard[i][j];
+        if (piece.own$.value == p &&
+            piece.checkDestinationReachable(i, j, k, l)) return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool moveDangerousPieces() {
+    List<List<PieceService>> currentBoard = _board$.value;
+    Player player = getPlaying();
+
+    for (var i = 0; i < size; i++) {
+      for (var j = 0; j < size; j++) {
+        if (currentBoard[i][j].own$.value == player &&
+            currentBoard[i][j].hasPossibleMovements(i, j, size) &&
+            checkPositionDangerous(i, j, Player.P1)) {
+          piece.setCoordinates(i, j);
+          if (moveToSafety()) {
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  bool moveToSafety() {
+    List<List<PieceService>> currentBoard = _board$.value;
+    PieceService p = currentBoard[piece.getI()][piece.getJ()];
+
+    for (var i = 0; i < size; i++) {
+      if (random.nextBool()) {
+        for (var j = 0; j < size; j++) {
+          if (currentBoard[i][j].own$.value != Player.P2 &&
+              p.checkDestinationReachable(piece.getI(), piece.getJ(), i, j) &&
+              !checkPositionDangerous(i, j, Player.P1)) {
+            print("Move to safety" +
+                piece.getI().toString() +
+                ":" +
+                piece.getJ().toString() +
+                " to " +
+                i.toString() +
+                ":" +
+                j.toString());
+            executeMove(i, j);
+            return true;
+          }
+        }
+      } else {
+        for (var j = size - 1; j >= 0; j--) {
+          if (currentBoard[i][j].own$.value != Player.P2 &&
+              p.checkDestinationReachable(piece.getI(), piece.getJ(), i, j) &&
+              !checkPositionDangerous(i, j, Player.P1)) {
+            print("Move to safety" +
+                piece.getI().toString() +
+                ":" +
+                piece.getJ().toString() +
+                " to " +
+                i.toString() +
+                ":" +
+                j.toString());
+            executeMove(i, j);
+            return true;
+          }
+        }
+      }
+    }
+
+    return false;
+  }
+
+  void carefulMove() {
+    List<List<PieceService>> currentBoard = _board$.value;
+    Player player = getPlaying();
+
+    for (var i = 0; i < size; i++) {
+      for (var j = 0; j < size; j++) {
+        if (currentBoard[i][j].own$.value == player &&
+            currentBoard[i][j].hasPossibleMovements(i, j, size) &&
+            !checkPositionDangerous(i, j, Player.P1)) {
+          piece.setCoordinates(i, j);
+          if (moveToSafety()) return;
+        }
+      }
+    }
+  }
+
+  void randomAIMove() {
+    List<List<PieceService>> currentBoard = _board$.value;
+    int count = 0;
+    Player player = getPlaying();
+//    print("Starting Random Move");
+
+    for (var i = 0; i < size; i++) {
+      for (var j = 0; j < size; j++) {
+        if (currentBoard[i][j].own$.value == player &&
+            currentBoard[i][j].hasPossibleMovements(i, j, size)) {
+          count++;
+        }
+      }
+    }
+
+//    print("Possible pieces to move " + count.toString());
+
+    int pieceIndex = random.nextInt(count);
+//    print("Random pieceIndex = " + pieceIndex.toString());
+    count = 0;
+    for (var i = 0; i < size; i++) {
+      for (var j = 0; j < size; j++) {
+        if (currentBoard[i][j].own$.value == player &&
+            currentBoard[i][j].hasPossibleMovements(i, j, size)) {
+          if (count == pieceIndex) {
+            piece.setCoordinates(i, j);
+//            print("Piece to move: " + i.toString() + ":" + j.toString());
+            randomAIPieceMove();
+            return;
+          } else {
+            count++;
+          }
+        }
+      }
+    }
+  }
+
+  void randomAIPieceMove() {
+    List<List<PieceService>> currentBoard = _board$.value;
+    PieceService p = currentBoard[piece.getI()][piece.getJ()];
+
+    if (piece.getI() < 3) {
+      for (var i = piece.getI() + 1; i < size; i++) {
+        if (random.nextBool()) {
+          for (var j = 0; j < size; j++) {
+//          print("Checking " + i.toString() + ":" + j.toString());
+            if (currentBoard[i][j].own$.value != Player.P2 &&
+                p.checkDestinationReachable(piece.getI(), piece.getJ(), i, j)) {
+              print("Random move " +
+                  piece.getI().toString() +
+                  ":" +
+                  piece.getJ().toString() +
+                  " to " +
+                  i.toString() +
+                  ":" +
+                  j.toString());
+              executeMove(i, j);
+              return;
+            }
+          }
+        } else {
+          for (var j = size - 1; j >= 0; j--) {
+//          print("Checking " + i.toString() + ":" + j.toString());
+            if (currentBoard[i][j].own$.value != Player.P2 &&
+                p.checkDestinationReachable(piece.getI(), piece.getJ(), i, j)) {
+              print("Random move " +
+                  piece.getI().toString() +
+                  ":" +
+                  piece.getJ().toString() +
+                  " to " +
+                  i.toString() +
+                  ":" +
+                  j.toString());
+              executeMove(i, j);
+              return;
+            }
+          }
+        }
+      }
+    } else {
+      for (var i = size - 1; i >= 0; i--) {
+        if (random.nextBool()) {
+          for (var j = 0; j < size; j++) {
+//          print("Checking " + i.toString() + ":" + j.toString());
+            if (currentBoard[i][j].own$.value != Player.P2 &&
+                p.checkDestinationReachable(piece.getI(), piece.getJ(), i, j)) {
+//            print("Random move " + piece.getI().toString() + ":" + piece.getJ().toString() + " to " + i.toString() + ":" + j.toString());
+              executeMove(i, j);
+              return;
+            }
+          }
+        } else {
+          for (var j = size - 1; j >= 0; j--) {
+//          print("Checking " + i.toString() + ":" + j.toString());
+            if (currentBoard[i][j].own$.value != Player.P2 &&
+                p.checkDestinationReachable(piece.getI(), piece.getJ(), i, j)) {
+//            print("Random move " + piece.getI().toString() + ":" + piece.getJ().toString() + " to " + i.toString() + ":" + j.toString());
+              executeMove(i, j);
+              return;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  void chooseAITwoPins() {
+    // TODO all
+    
+    switch (gameDifficulty$.value) {
+      case Difficulty.Easy:
+        break;
+      case Difficulty.Medium:
+        break;
+      case Difficulty.Hard:
+        break;
+      default:
+    }
   }
 
   void swapPieceAnimation() {
@@ -190,6 +506,17 @@ class BoardService {
   }
 
   int handleClick(int i, int j) {
+    if (!inGame) return 0;
+
+    if (checkWinner() != null) {
+      nextTurn();
+    }
+
+    if (gameMode$.value != GameMode.TwoPlayers && getPlaying() == Player.P2) {
+      print("Not your move");
+      return 0;
+    }
+
     print(turnPhase);
 
     switch (turnPhase) {
@@ -212,6 +539,11 @@ class BoardService {
           }
 
           swapPieceAnimation(); // put
+        } else if (_board$.value[i][j].own$.value != getPlaying()) {
+          changePossiblePieceDestinations(false);
+          piece.clean();
+          turnPhase = Phase.ChoosePieceToMove;
+          swapPieceAnimation();
         }
         break;
       case Phase.ChoosePieceToPin:
@@ -310,14 +642,6 @@ class BoardService {
     _board$.add([
       [
         PieceService(6, Player.P2, Player.P2 == _start),
-        PieceService(5, Player.P2, Player.P2 == _start),
-        PieceService(4, Player.P2, Player.P2 == _start),
-        PieceService(3, Player.P2, Player.P2 == _start),
-        PieceService(2, Player.P2, Player.P2 == _start),
-        PieceService(1, Player.P2, Player.P2 == _start)
-      ],
-      [
-        PieceService.empty(),
         PieceService.empty(),
         PieceService.empty(),
         PieceService.empty(),
@@ -346,6 +670,14 @@ class BoardService {
         PieceService.empty(),
         PieceService.empty(),
         PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService(1, Player.P2, Player.P2 == _start),
         PieceService.empty()
       ],
       [
@@ -364,6 +696,11 @@ class BoardService {
     piece = Coordinate.origin();
     pinsSelected = 0;
     inGame = start;
+
+    if (gameMode$.value != GameMode.TwoPlayers && _start == Player.P2) {
+      swapPieceAnimation();
+      performAITurn();
+    }
   }
 
   void newGame(bool start) {
@@ -388,11 +725,11 @@ class BoardService {
     _board$ = BehaviorSubject<List<List<PieceService>>>.seeded([
       [
         PieceService(6, Player.P2, Player.P2 == _start),
-        PieceService(5, Player.P2, Player.P2 == _start),
-        PieceService(4, Player.P2, Player.P2 == _start),
-        PieceService(3, Player.P2, Player.P2 == _start),
-        PieceService(2, Player.P2, Player.P2 == _start),
-        PieceService(1, Player.P2, Player.P2 == _start)
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
       ],
       [
         PieceService.empty(),
@@ -421,7 +758,7 @@ class BoardService {
       [
         PieceService.empty(),
         PieceService.empty(),
-        PieceService.empty(),
+        PieceService(1, Player.P2, Player.P2 == _start),
         PieceService.empty(),
         PieceService.empty(),
         PieceService.empty()
