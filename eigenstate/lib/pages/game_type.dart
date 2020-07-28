@@ -38,7 +38,8 @@ class _GameTypeState extends State<GameType> {
         listener: (AdmobAdEvent event, Map<String, dynamic> args) {
           if (event == AdmobAdEvent.closed) interstitialAd.load();
           if (debugMode) handleEvent(event, args, "Interstitial");
-        })..load();
+        })
+      ..load();
   }
 
   void handleEvent(
@@ -264,10 +265,11 @@ class _GameTypeState extends State<GameType> {
                 child: AdmobBanner(
                   adUnitId: adMobService.getBannerAdId(),
                   adSize: AdmobBannerSize.FULL_BANNER,
-                  listener: debugMode ?
-                      (AdmobAdEvent event, Map<String, dynamic> args) {
-                    handleEvent(event, args, 'Banner');
-                  } : null,
+                  listener: debugMode
+                      ? (AdmobAdEvent event, Map<String, dynamic> args) {
+                          handleEvent(event, args, 'Banner');
+                        }
+                      : null,
                 ),
               ),
             ],

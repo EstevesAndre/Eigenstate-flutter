@@ -457,7 +457,7 @@ class BoardService {
 
   void chooseAITwoPins() {
     // TODO all
-    
+
     switch (gameDifficulty$.value) {
       case Difficulty.Easy:
         break;

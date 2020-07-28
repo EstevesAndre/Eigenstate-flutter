@@ -158,8 +158,11 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
 
           return Transform(
             transform: Matrix4.identity()
-              ..setEntry(3, 2, hasTransform && gameMode != GameMode.TwoPlayers ? 0.07 : 0.0)
-              ..rotateX(hasTransform && gameMode != GameMode.TwoPlayers ? -0.01 : 0.0),
+              ..setEntry(3, 2,
+                  hasTransform && gameMode != GameMode.TwoPlayers ? 0.07 : 0.0)
+              ..rotateX(hasTransform && gameMode != GameMode.TwoPlayers
+                  ? -0.01
+                  : 0.0),
             alignment: FractionalOffset.center,
             child: Container(
               child: Column(
@@ -174,7 +177,6 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
                           mainAxisSize: MainAxisSize.min,
                           children: row
                               .asMap()
-
                               .map(
                                 (j, item) => MapEntry(
                                   j,

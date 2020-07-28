@@ -21,7 +21,6 @@ class PieceService {
   BehaviorSubject<bool> _pieceMoved$;
   BehaviorSubject<bool> get pieceMoved$ => _pieceMoved$;
 
-
   PieceService(int _id, Player _own, bool _toAnimate) {
     _initStreams(_id, _own, _toAnimate);
   }
@@ -63,12 +62,16 @@ class PieceService {
 
     for (var i = 0; i < s; i++) {
       for (var j = 0; j < s; j++) {
-        if (checkDestinationReachable(k, l, i, j))
-          isPossible = true;
+        if (checkDestinationReachable(k, l, i, j)) isPossible = true;
       }
     }
 
-    print("piece " + k.toString() + ":" + l.toString() + " = " + (isPossible ? "True" : "FALSE"));
+    print("piece " +
+        k.toString() +
+        ":" +
+        l.toString() +
+        " = " +
+        (isPossible ? "True" : "FALSE"));
     return isPossible;
   }
 

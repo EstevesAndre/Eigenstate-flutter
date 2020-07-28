@@ -32,7 +32,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                   shrinkWrap: true,
                   children: <Widget>[
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 30),
                       alignment: Alignment.center,
                       child: Text(
                         "How to play",
@@ -44,7 +45,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: Text(
                         "      Eigenstate is a two-player abstract strategy game with incredibly simple rules that grows in complexity as you play.",
                         style: TextStyle(
@@ -78,7 +80,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: Text(
                         "      Each player have sic pieces and each one has twenty five pins. Every piece starts with two pin in it: pin in the center represents its position on the board, and one additional allowing the piece to move one space forward.",
                         style: TextStyle(
@@ -104,7 +107,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
                       child: Text(
                         "      On a player's turn, in this order, if possible, they must:\n  1.  Firstly, move one of their pieces.\n  2. Then place two pins in any of their pieces.",
                         style: TextStyle(
@@ -172,7 +176,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 0),
                       child: Text(
                         "      - Pieces can jump over other pieces.",
                         style: TextStyle(
@@ -182,7 +187,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 0),
                       child: Text(
                         "      - Pieces cannot move off the game board.",
                         style: TextStyle(
@@ -192,7 +198,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 0),
                       child: Text(
                         "      - Pieces do not rotate.",
                         style: TextStyle(
@@ -202,7 +209,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 0),
                       child: Text(
                         "      - A piece cannot move backwards unless there is a pin behind the piece's center pin.",
                         style: TextStyle(
@@ -244,7 +252,8 @@ class HowToPlayState extends State<HowToPlayPage> {
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 30, vertical: 0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30, vertical: 0),
                       child: Text(
                         "      - You can place your two pins on different pieces on the same turn.",
                         style: TextStyle(

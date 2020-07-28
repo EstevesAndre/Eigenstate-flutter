@@ -1,14 +1,12 @@
 import 'dart:io';
 
 class AdMobService {
-
   final debug = true;
 
   String getAdMobAppId() {
     if (Platform.isIOS) {
       return null; // test: ca-app-pub-3940256099942544~1458002511
-    }
-    else if (Platform.isAndroid) {
+    } else if (Platform.isAndroid) {
       return 'ca-app-pub-4496581272931045~9570112611';
     }
 
@@ -24,13 +22,13 @@ class AdMobService {
 
     if (Platform.isIOS) {
       return null;
-    }
-    else if (Platform.isAndroid) {
+    } else if (Platform.isAndroid) {
       return 'ca-app-pub-4496581272931045/3551499177';
     }
 
     return null;
   }
+
   String getInterstitialAdId() {
     if (debug && Platform.isIOS) {
       return 'ca-app-pub-3940256099942544/4411468910';
@@ -40,8 +38,7 @@ class AdMobService {
 
     if (Platform.isIOS) {
       return null;
-    }
-    else if (Platform.isAndroid) {
+    } else if (Platform.isAndroid) {
       return 'ca-app-pub-4496581272931045/6687447332';
     }
 
@@ -57,8 +54,7 @@ class AdMobService {
 
     if (Platform.isIOS) {
       return null;
-    }
-    else if (Platform.isAndroid) {
+    } else if (Platform.isAndroid) {
       return '';
     }
 
