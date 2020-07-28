@@ -11,14 +11,14 @@ class AlertService {
 
   AlertService() {
     _resultAlertStyle = AlertStyle(
-      animationType: AnimationType.grow,
+      animationType: AnimationType.fromLeft,
       isCloseButton: false,
       isOverlayTapDismiss: false,
       backgroundColor: Colors.white,
       titleStyle: TextStyle(
           color: Colors.black87, fontWeight: FontWeight.w700, fontSize: 20),
       descStyle: TextStyle(fontSize: 17, color: Colors.black87),
-      animationDuration: Duration(milliseconds: 1000),
+      animationDuration: Duration(milliseconds: 600),
       buttonAreaPadding: EdgeInsets.all(12),
       overlayColor: Colors.black.withOpacity(.7),
       alertBorder: RoundedRectangleBorder(
