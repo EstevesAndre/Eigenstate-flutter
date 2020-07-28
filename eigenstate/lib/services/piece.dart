@@ -43,10 +43,6 @@ class PieceService {
     int offsetI = destinationI - positionI;
     int offsetJ = destinationJ - positionJ;
 
-//    print("Pos: " + positionI.toString() + " " + positionJ.toString());
-//    print("Des: " + destinationI.toString() + " " + destinationJ.toString());
-//    print("Offset: " + offsetI.toString() + " " + offsetJ.toString());
-
     if (offsetI < -2 || offsetJ < -2 || offsetI > 2 || offsetJ > 2)
       return false;
 
@@ -65,13 +61,6 @@ class PieceService {
         if (checkDestinationReachable(k, l, i, j)) isPossible = true;
       }
     }
-
-    print("piece " +
-        k.toString() +
-        ":" +
-        l.toString() +
-        " = " +
-        (isPossible ? "True" : "FALSE"));
     return isPossible;
   }
 
@@ -82,6 +71,13 @@ class PieceService {
         line.forEach((pin) => pin == Pin.Disable ? isFull = false : null));
 
     return isFull;
+  }
+
+  void show() {
+    print("Own[" +
+        _id$.value.toString() +
+        "] " +
+        (own$.value == Player.P1 ? "Player 1" : "Player 2"));
   }
 
   bool checkPin(int i, int j) {
@@ -296,7 +292,7 @@ class PieceService {
         Pin.Disable,
         Pin.Disable
       ],
-      [Pin.Disable, Pin.Disable, Pin.Center, Pin.Active, Pin.Disable],
+      [Pin.Disable, Pin.Disable, Pin.Center, Pin.Disable, Pin.Disable],
       [
         Pin.Disable,
         Pin.Disable,
