@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'dart:math';
+import 'dart:core';
 import 'package:rxdart/rxdart.dart';
 
 import 'package:eigenstate/services/provider.dart';
@@ -148,16 +149,6 @@ class BoardService {
         }
       }
     }
-
-//    print("Size");
-//    print(_p1Pieces.length);
-//    print(_p2Pieces.length);
-//    _p1Pieces.forEach((key, value) {
-//      value.show();
-//    });
-//    _p2Pieces.forEach((key, value) {
-//      value.show();
-//    });
   }
 
   void nextTurn() {
@@ -221,13 +212,15 @@ class BoardService {
       case Difficulty.Medium:
         if (captureMove(true)) return;
         if (moveDangerousPieces()) return;
-        carefulMove();
+        if (carefulMove()) return;
+        lessDangerousMove();
         break;
       case Difficulty.Hard:
         if (captureMove(true)) return;
         if (moveDangerousPieces()) return;
         if (moveToCounter()) return;
-        carefulMove();
+        if (carefulMove()) return;
+        lessDangerousMove();
         break;
       default:
     }
@@ -387,7 +380,7 @@ class BoardService {
     return false;
   }
 
-  void carefulMove() {
+  bool carefulMove() {
     for (MapEntry<MapEntry<int, int>, PieceService> pieceEntry
         in _p2Pieces.entries) {
       if (pieceEntry.value.hasPossibleMovements(
@@ -395,11 +388,11 @@ class BoardService {
           !checkPositionDangerous(
               pieceEntry.key.key, pieceEntry.key.value, Player.P1)) {
         piece.setCoordinates(pieceEntry.key.key, pieceEntry.key.value);
-        if (moveToSafety()) return;
+        if (moveToSafety()) return true;
       }
     }
 
-    print("DIDNT MOVE");
+    return false;
   }
 
   void randomAIMove() {
@@ -424,6 +417,100 @@ class BoardService {
           return;
         } else {
           count++;
+        }
+      }
+    }
+  }
+
+  void lessDangerousMove() {
+    List<List<PieceService>> currentBoard = _board$.value;
+
+    for (var i = 0; i < size; i++) {
+      if (random.nextBool()) {
+        for (var j = 0; j < size; j++) {
+          PieceService p = currentBoard[i][j];
+          if (p.own$.value == Player.P2) {
+            for (var k = 0; k < size; k++) {
+              if (random.nextBool()) {
+                for (var l = 0; l < size; l++) {
+                  if (currentBoard[k][l].own$.value != Player.P2 &&
+                      p.checkDestinationReachable(i, j, k, l)) {
+                    piece.setCoordinates(i, j);
+                    print("Move dangerously " +
+                        piece.getI().toString() +
+                        ":" +
+                        piece.getJ().toString() +
+                        " to " +
+                        k.toString() +
+                        ":" +
+                        l.toString());
+                    executeMove(k, l);
+                    return;
+                  }
+                }
+              } else {
+                for (var l = size - 1; l >= 0; l++) {
+                  if (currentBoard[k][l].own$.value != Player.P2 &&
+                      p.checkDestinationReachable(i, j, k, l)) {
+                    piece.setCoordinates(i, j);
+                    print("Move dangerously " +
+                        piece.getI().toString() +
+                        ":" +
+                        piece.getJ().toString() +
+                        " to " +
+                        k.toString() +
+                        ":" +
+                        l.toString());
+                    executeMove(k, l);
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        }
+      } else {
+        for (var j = size - 1; j >= 0; j--) {
+          PieceService p = currentBoard[i][j];
+          if (p.own$.value == Player.P2) {
+            for (var k = 0; k < size; k++) {
+              if (random.nextBool()) {
+                for (var l = 0; l < size; l++) {
+                  if (currentBoard[k][l].own$.value != Player.P2 &&
+                      p.checkDestinationReachable(i, j, k, l)) {
+                    piece.setCoordinates(i, j);
+                    print("Move dangerously " +
+                        piece.getI().toString() +
+                        ":" +
+                        piece.getJ().toString() +
+                        " to " +
+                        k.toString() +
+                        ":" +
+                        l.toString());
+                    executeMove(k, l);
+                    return;
+                  }
+                }
+              } else {
+                for (var l = size - 1; l >= 0; l++) {
+                  if (currentBoard[k][l].own$.value != Player.P2 &&
+                      p.checkDestinationReachable(i, j, k, l)) {
+                    piece.setCoordinates(i, j);
+                    print("Move dangerously " +
+                        piece.getI().toString() +
+                        ":" +
+                        piece.getJ().toString() +
+                        " to " +
+                        k.toString() +
+                        ":" +
+                        l.toString());
+                    executeMove(k, l);
+                    return;
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -504,29 +591,29 @@ class BoardService {
     switch (gameDifficulty$.value) {
       case Difficulty.Easy:
         while (pinsSelected < 2) {
-          if (insertPinToGetPiece()) return;
-          if (rounds$.value.key < 10)
-            insertForwardPin();
+          if (insertPinToGetPiece()) {
+          } else if (_p2Pieces.length <= 3 &&
+              _p1Pieces.length >= 3 &&
+              rounds$.value.key > 8)
+            insertRandomPiecePin(true);
           else
-            insertProtectionPin();
+            insertRandomPiecePin(false);
         }
         break;
       case Difficulty.Medium:
         while (pinsSelected < 2) {
-          if (insertPinToGetPiece()) return;
-          if (rounds$.value.key < 10)
-            insertForwardPin();
-          else
-            insertProtectionPin();
+          if (insertPinToGetPiece()) {
+          } else if (!checkProtectionPinNeed()) {
+            insertRandomPiecePin(false);
+          }
         }
         break;
       case Difficulty.Hard:
         while (pinsSelected < 2) {
-          if (insertPinToGetPiece()) return;
-          if (rounds$.value.key < 10)
-            insertForwardPin();
-          else
-            insertProtectionPin();
+          if (insertPinToGetPiece()) {
+          } else if (!checkProtectionPinNeed()) {
+            insertRandomPiecePin(false);
+          }
         }
         break;
       default:
@@ -603,44 +690,71 @@ class BoardService {
     int rand = random.nextInt(4);
     int row;
 
-    if (rand < 3) {
+    if (rand < 3)
       row = 3;
-      if (random.nextBool())
-        for (var k = 2; k < 5; k++) {
-          if (checkAddPin(i, j, row, k)) return true;
-        }
-      else
-        for (var k = 2; k >= 0; k--) {
-          if (checkAddPin(i, j, row, k)) return true;
-        }
-    } else {
+    else
       row = 4;
-      if (random.nextBool())
-        for (var k = 2; k < 5; k++) {
-          if (checkAddPin(i, j, row, k)) return true;
-        }
-      else
-        for (var k = 2; k >= 0; k--) {
-          if (checkAddPin(i, j, row, k)) return true;
-        }
-    }
+
+    if (random.nextBool())
+      for (var k = 2; k < 5; k++) {
+        if (checkAddPin(i, j, row, k)) return true;
+      }
+    else
+      for (var k = 2; k >= 0; k--) {
+        if (checkAddPin(i, j, row, k)) return true;
+      }
 
     print("Failed to add Pin Forward");
 
     return false;
   }
 
-  void insertForwardPin() {
+  bool addProtectionPin(int i, int j) {
+    int rand = random.nextInt(5);
+    int row;
+
+    if (i == 0)
+      row = 2;
+    else if (i == 1) {
+      if (rand < 3)
+        row = 2;
+      else
+        row = 1;
+    } else if (rand < 3)
+      row = 1;
+    else if (rand < 4)
+      row = 0;
+    else
+      row = 2;
+
+    if (j < 3)
+      for (var k = (row == 2 ? 3 : 2); k < 5; k++) {
+        if (checkAddPin(i, j, row, k)) return true;
+      }
+    else
+      for (var k = (row == 2 ? 3 : 1); k >= 0; k--) {
+        if (checkAddPin(i, j, row, k)) return true;
+      }
+
+    print("Failed to add Pin Backwards");
+
+    return false;
+  }
+
+  void insertRandomPiecePin(bool protection) {
     int count = 0;
     int index = 0;
 
     while (true) {
       index = random.nextInt(_p2Pieces.length);
-      print("Try " + index.toString());
       count = 0;
       for (MapEntry<int, int> pieceEntry in _p2Pieces.keys) {
         if (index == count) {
-          if (addForwardPin(pieceEntry.key, pieceEntry.value)) return;
+          if (protection) {
+            if (addProtectionPin(pieceEntry.key, pieceEntry.value)) return;
+          } else {
+            if (addForwardPin(pieceEntry.key, pieceEntry.value)) return;
+          }
         } else {
           count++;
         }
@@ -648,11 +762,21 @@ class BoardService {
     }
   }
 
-  void insertProtectionPin() {
-    print("Adding protection pin...");
+  bool checkProtectionPinNeed() {
+    for (MapEntry<int, int> piece in _p2Pieces.keys) {
+      for (MapEntry<int, int> p in _p1Pieces.keys) {
+        int difKey =
+            (piece.key - p.key) < 0 ? (p.key - piece.key) : (piece.key - p.key);
+        int difValue = (piece.value - p.value) < 0
+            ? (p.value - piece.value)
+            : (piece.value - p.value);
+        if (difKey <= 2 && difValue <= 2 && piece.key != 0) {
+          if (addProtectionPin(piece.key, piece.value)) return true;
+        }
+      }
+    }
 
-    // TODO
-    insertForwardPin();
+    return false;
   }
 
   void swapPieceAnimation() {
