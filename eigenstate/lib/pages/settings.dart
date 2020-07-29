@@ -3,6 +3,7 @@ import 'package:eigenstate/theme/theme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/services/sound.dart';
@@ -16,6 +17,36 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   final boardService = locator<BoardService>();
   final soundService = locator<SoundService>();
+
+  Future<void> addBoolToSF(String key, bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool(key, value);
+
+    if (key == "sound")
+      soundService.enableSound$.add(value);
+    else if (key == "board3D") boardService.thirdDimension$.add(value);
+  }
+
+  Future<bool> getBoolValuesSF(String key) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey(key))
+      return prefs.getBool(key);
+    else
+      addBoolToSF(key, true);
+
+    return true;
+  }
+
+  Future<void> _updateBoolValuesSF() async {
+    boardService.thirdDimension$.add(await getBoolValuesSF("board3D"));
+    soundService.enableSound$.add(await getBoolValuesSF("sound"));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _updateBoolValuesSF();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +103,7 @@ class SettingsPageState extends State<SettingsPage> {
                         Expanded(child: Container()),
                         CupertinoSwitch(
                           onChanged: (e) {
-                            soundService.enableSound$.add(e);
+                            addBoolToSF("sound", e);
                             soundService.playSound('sounds/slide');
                           },
                           value: isSoundEnabled,
@@ -95,7 +126,7 @@ class SettingsPageState extends State<SettingsPage> {
                         Expanded(child: Container()),
                         CupertinoSwitch(
                           onChanged: (e) {
-                            boardService.thirdDimension$.add(e);
+                            addBoolToSF("board3D", e);
                             soundService.playSound('sounds/slide');
                           },
                           value: isThirdDimensionEnabled,

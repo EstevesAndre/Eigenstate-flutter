@@ -28,6 +28,7 @@ dependencies:
   audioplayers: ^0.15.1
   rflutter_alert: ^1.0.3
   admob_flutter: ^0.3.4
+  shared_preferences: ^0.5.8
 
 dev_dependencies:
   flutter_test:
