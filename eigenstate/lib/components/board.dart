@@ -27,6 +27,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
   final alertService = locator<AlertService>();
   final adMobService = locator<AdMobService>();
   final storeService = locator<StoreService>();
+  final theme = locator<Themes>();
+
   AdmobInterstitial interstitialAd;
   AdmobReward rewardAd;
 
@@ -180,7 +182,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
   Widget _buildBox(
       int i, int j, PieceService item, double pieceSize, double pinSize) {
     BoxBorder border = Border();
-    BorderSide borderStyle = BorderSide(width: 3, color: Colors.black26);
+    BorderSide borderStyle =
+        BorderSide(width: 2, color: theme.getBoardBorderColor());
 
     border = Border(
         top: i == 0 ? borderStyle : BorderSide.none,
@@ -194,16 +197,22 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
         key: ValueKey<int>(
             item.pieceMoved$.value ? i * 6 + j * 2 + 1 : i * 6 + j),
         decoration: BoxDecoration(
-          color: (i + j) % 2 == 0 ? Themes.p1Orange : Themes.p1Orange2,
+          color: (i + j) % 2 == 0
+              ? theme.getBoardEmptyCellColor1()
+              : theme.getBoardEmptyCellColor2(),
           border: border,
         ),
         height: pieceSize,
         width: pieceSize,
         child: AnimatedContainer(
           duration: Duration(milliseconds: 750),
-          color: item.toAnimate$.value
-              ? Colors.lightGreenAccent
-              : Colors.transparent,
+          color: item.own$.value == Player.P1
+              ? item.toAnimate$.value
+                  ? theme.getBoardP1PieceHighlightColor1()
+                  : theme.getBoardP1PieceHighlightColor2()
+              : item.toAnimate$.value
+                  ? theme.getBoardP2PieceHighlightColor1()
+                  : theme.getBoardP2PieceHighlightColor2(),
           curve: Curves.ease,
           child: Center(
             child: item.own$.value == null
@@ -212,8 +221,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
                     pieceSize * 5 / 6,
                     pinSize,
                     item.own$.value == Player.P1
-                        ? Themes.p1Blue
-                        : Themes.p1Grey,
+                        ? theme.getBoardP1PieceColor()
+                        : theme.getBoardP2PieceColor(),
                     item),
           ),
         ),
@@ -228,8 +237,12 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(100),
           color: p == Player.P1
-              ? (pin == Pin.Active ? Themes.p1PinSelected : Themes.p1PinEmpty)
-              : (pin == Pin.Active ? Themes.p2PinSelected : Themes.p2PinEmpty),
+              ? (pin == Pin.Active
+                  ? theme.getBoardP1PegColor()
+                  : theme.getBoardP1EmptyPegColor())
+              : (pin == Pin.Active
+                  ? theme.getBoardP2PegColor()
+                  : theme.getBoardP2EmptyPegColor()),
         ));
   }
 
@@ -248,17 +261,14 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           width: pieceHeight,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.elliptical(5, 5)),
-            gradient: RadialGradient(
-              radius: 0.0,
-              colors: [
-                Colors.transparent,
-                p == Player.P1 ? Themes.p1Blue : Themes.p1Grey
-              ],
-              stops: [1, 1],
-            ),
+            color: p == Player.P1
+                ? theme.getBoardP1PieceColor()
+                : theme.getBoardP2PieceColor(),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                  color: p == Player.P2 ? Themes.p1Blue : Themes.p1Grey,
+                  color: p == Player.P2
+                      ? theme.getBoardP1PieceColor()
+                      : theme.getBoardP2PieceColor(),
                   spreadRadius: 5.0,
                   offset: Offset(5.0, 5.0))
             ],
@@ -306,7 +316,9 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
                                           decoration: BoxDecoration(
                                             borderRadius: BorderRadius.circular(
                                                 pieceSize),
-                                            color: Themes.p1Orange,
+                                            color: p == Player.P1
+                                                ? theme.getBoardP1CenterColor()
+                                                : theme.getBoardP2CenterColor(),
                                           ),
                                         )
                                       : buildPin(i, j, pieceSize, p, pin),
@@ -350,17 +362,27 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           child: Text(
             "Continue".toUpperCase(),
             style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                color: theme.getDefaultTextColor(),
+                fontSize: 20,
+                fontWeight: FontWeight.w700),
           ),
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: [Themes.p1Grey, Themes.p1Blue]),
+              stops: [
+                0.1,
+                0.8
+              ],
+              colors: [
+                theme.getDefaultButtonGradientColor1(),
+                theme.getDefaultButtonGradientColor2()
+              ]),
           radius: BorderRadius.circular(200),
           onPressed: () {
             Navigator.pop(context);
-            gameMode == GameMode.TwoPlayers ? showEndGamePopUp() : showRewardDialog();
+            gameMode == GameMode.TwoPlayers
+                ? showEndGamePopUp()
+                : showRewardDialog();
           },
         )
       ],
@@ -369,7 +391,9 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
         child: Text(
           desc,
           style: TextStyle(
-              color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+              color: theme.getDefaultPopupTextColor(),
+              fontSize: 15,
+              fontWeight: FontWeight.w500),
         ),
       ),
     ).show();
@@ -391,12 +415,12 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             children: [
               Icon(
                 Icons.toys,
-                color: Colors.redAccent,
+                color: theme.getGamePageConcurrencyColor(),
               ),
               Text(
                 " +" + storeService.endGameBonus.toString(),
                 style: TextStyle(
-                    color: Colors.white,
+                    color: theme.getDefaultButtonTextColor(),
                     fontSize: 20,
                     fontWeight: FontWeight.w700),
               ),
@@ -405,8 +429,14 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: [Themes.p1Grey, Themes.p1Blue]),
+              stops: [
+                0.1,
+                0.8
+              ],
+              colors: [
+                theme.getDefaultButtonGradientColor1(),
+                theme.getDefaultButtonGradientColor2()
+              ]),
           radius: BorderRadius.circular(200),
           onPressed: () async {
             soundService.playSound('sounds/click');
@@ -422,19 +452,22 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(Icons.ondemand_video, color: Colors.white),
+              Icon(
+                Icons.ondemand_video,
+                color: theme.getDefaultButtonTextColor(),
+              ),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.toys,
-                    color: Colors.redAccent,
+                    color: theme.getGamePageConcurrencyColor(),
                   ),
                   Text(
                     " +" + storeService.endGameBonus.toString(),
                     style: TextStyle(
-                        color: Colors.white,
+                        color: theme.getDefaultButtonTextColor(),
                         fontSize: 20,
                         fontWeight: FontWeight.w700),
                   ),
@@ -445,8 +478,14 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: [Themes.p1Grey, Themes.p1Blue]),
+              stops: [
+                0.1,
+                0.8
+              ],
+              colors: [
+                theme.getDefaultButtonGradientColor1(),
+                theme.getDefaultButtonGradientColor2()
+              ]),
           radius: BorderRadius.circular(200),
           onPressed: () async {
             soundService.playSound('sounds/click');
@@ -473,7 +512,9 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
         child: Text(
           "Get a reward",
           style: TextStyle(
-              color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+              color: theme.getDefaultPopupTextColor(),
+              fontSize: 15,
+              fontWeight: FontWeight.w500),
         ),
       ),
     ).show();
@@ -491,13 +532,21 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           child: Text(
             "No",
             style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                color: theme.getDefaultButtonTextColor(),
+                fontSize: 20,
+                fontWeight: FontWeight.w700),
           ),
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: [Themes.p1Grey, Themes.p1Blue]),
+              stops: [
+                0.1,
+                0.8
+              ],
+              colors: [
+                theme.getDefaultButtonGradientColor1(),
+                theme.getDefaultButtonGradientColor2()
+              ]),
           radius: BorderRadius.circular(200),
           onPressed: () {
             boardService.newGame(false);
@@ -514,13 +563,21 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           child: Text(
             "Yes",
             style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                color: theme.getDefaultButtonTextColor(),
+                fontSize: 20,
+                fontWeight: FontWeight.w700),
           ),
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: [Themes.p1Grey, Themes.p1Blue]),
+              stops: [
+                0.1,
+                0.8
+              ],
+              colors: [
+                theme.getDefaultButtonGradientColor1(),
+                theme.getDefaultButtonGradientColor2()
+              ]),
           radius: BorderRadius.circular(200),
           onPressed: () {
             soundService.playSound('sounds/click');

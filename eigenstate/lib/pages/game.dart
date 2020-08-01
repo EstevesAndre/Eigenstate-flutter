@@ -19,11 +19,11 @@ class GamePage extends StatefulWidget {
 }
 
 class GameState extends State<GamePage> {
-  final debugMode = false;
   final boardService = locator<BoardService>();
   final alertService = locator<AlertService>();
   final adMobService = locator<AdMobService>();
   final storeService = locator<StoreService>();
+  final theme = locator<Themes>();
 
   @override
   void initState() {
@@ -50,7 +50,6 @@ class GameState extends State<GamePage> {
 
     return SafeArea(
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
             child: StreamBuilder<
                 MapEntry<
@@ -90,8 +89,8 @@ class GameState extends State<GamePage> {
                 end: Alignment.bottomCenter,
                 stops: [0, 1],
                 colors: [
-                  Themes.p1Purple,
-                  Themes.p1Blue,
+                  theme.getGamePageBackgroundGradientColor1(),
+                  theme.getGamePageBackgroundGradientColor2(),
                 ],
               )),
               child: Column(
@@ -114,7 +113,7 @@ class GameState extends State<GamePage> {
                                   child: Text(
                                     "Player 1",
                                     style: TextStyle(
-                                        color: Colors.white,
+                                        color: theme.getDefaultTextColor(),
                                         fontSize: h5FontSize),
                                   ),
                                 ),
@@ -130,7 +129,8 @@ class GameState extends State<GamePage> {
                                         pieceSize,
                                         pieceSize,
                                         pinSize,
-                                        Themes.p1Grey,
+                                        theme.getPieceNumberColor(),
+                                        theme.getPieceNumberPegColor(),
                                         p1Score,
                                         Player.P2),
                                   ),
@@ -148,7 +148,7 @@ class GameState extends State<GamePage> {
                                   border: Border(
                                     bottom: BorderSide(
                                       width: 1,
-                                      color: Colors.white,
+                                      color: theme.getDefaultTextColor(),
                                     ),
                                   ),
                                 ),
@@ -164,7 +164,7 @@ class GameState extends State<GamePage> {
                                         Icons.arrow_back_ios,
                                         size: h5FontSize,
                                       ),
-                                      color: Colors.white,
+                                      color: theme.getDefaultTextColor(),
                                       onPressed: () {
                                         soundService.playSound('sounds/click');
 
@@ -180,14 +180,16 @@ class GameState extends State<GamePage> {
                                       children: <Widget>[
                                         Icon(
                                           Icons.toys,
-                                          color: Colors.redAccent,
+                                          color: theme
+                                              .getGamePageConcurrencyColor(),
                                           size: h5FontSize,
                                         ),
                                         SizedBox(width: 15),
                                         Text(
                                           coins.toString(),
                                           style: TextStyle(
-                                              color: Colors.white,
+                                              color:
+                                                  theme.getDefaultTextColor(),
                                               fontSize: h5FontSize),
                                         ),
                                       ],
@@ -198,17 +200,21 @@ class GameState extends State<GamePage> {
                                         Text(
                                           "Mode: ",
                                           style: TextStyle(
-                                              color: Colors.white,
+                                              color:
+                                                  theme.getDefaultTextColor(),
                                               fontSize: h5FontSize),
                                         ),
                                         Text(
                                           gameDifficulty.value,
                                           style: TextStyle(
                                               color: gameDifficulty.key == 1
-                                                  ? Colors.lightGreenAccent
+                                                  ? theme
+                                                      .getGamePageEasyModeColor()
                                                   : gameDifficulty.key == 2
-                                                      ? Colors.yellowAccent
-                                                      : Colors.redAccent,
+                                                      ? theme
+                                                          .getGamePageMediumModeColor()
+                                                      : theme
+                                                          .getGamePageHardModeColor(),
                                               fontSize: h5FontSize),
                                         ),
                                       ],
@@ -238,7 +244,8 @@ class GameState extends State<GamePage> {
                                             child: Text(
                                               "You",
                                               style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: theme
+                                                      .getDefaultTextColor(),
                                                   fontSize: h5FontSize),
                                             ),
                                           ),
@@ -256,7 +263,9 @@ class GameState extends State<GamePage> {
                                                   pieceSize,
                                                   pieceSize,
                                                   pinSize,
-                                                  Themes.p1Grey,
+                                                  theme.getPieceNumberColor(),
+                                                  theme
+                                                      .getPieceNumberPegColor(),
                                                   p1Score,
                                                   Player.P2),
                                             ),
@@ -277,7 +286,8 @@ class GameState extends State<GamePage> {
                                               child: Text(
                                                 "Turn",
                                                 style: TextStyle(
-                                                    color: Colors.white,
+                                                    color: theme
+                                                        .getDefaultTextColor(),
                                                     fontSize: h5FontSize),
                                               ),
                                             ),
@@ -296,7 +306,10 @@ class GameState extends State<GamePage> {
                                                           pieceSize,
                                                           pieceSize,
                                                           pinSize,
-                                                          Themes.p1Grey,
+                                                          theme
+                                                              .getPieceNumberColor(),
+                                                          theme
+                                                              .getPieceNumberPegColor(),
                                                           round,
                                                           Player.P2),
                                                     )
@@ -312,7 +325,10 @@ class GameState extends State<GamePage> {
                                                             pieceSize * 4 / 5,
                                                             pieceSize,
                                                             pinSize,
-                                                            Themes.p1Grey,
+                                                            theme
+                                                                .getPieceNumberColor(),
+                                                            theme
+                                                                .getPieceNumberPegColor(),
                                                             round ~/ 10,
                                                             Player.P2),
                                                         SizedBox(width: 10),
@@ -320,7 +336,10 @@ class GameState extends State<GamePage> {
                                                             pieceSize * 4 / 5,
                                                             pieceSize,
                                                             pinSize,
-                                                            Themes.p1Grey,
+                                                            theme
+                                                                .getPieceNumberColor(),
+                                                            theme
+                                                                .getPieceNumberPegColor(),
                                                             round % 10,
                                                             Player.P2),
                                                       ],
@@ -344,7 +363,8 @@ class GameState extends State<GamePage> {
                                             child: Text(
                                               "AI",
                                               style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: theme
+                                                      .getDefaultTextColor(),
                                                   fontSize: h5FontSize),
                                             ),
                                           ),
@@ -362,7 +382,9 @@ class GameState extends State<GamePage> {
                                                   pieceSize,
                                                   pieceSize,
                                                   pinSize,
-                                                  Themes.p1Grey,
+                                                  theme.getPieceNumberColor(),
+                                                  theme
+                                                      .getPieceNumberPegColor(),
                                                   p2Score,
                                                   Player.P2),
                                             ),
@@ -397,14 +419,15 @@ class GameState extends State<GamePage> {
                                   ? "Your turn"
                                   : "Oponnent turn",
                               style: TextStyle(
-                                  color: Colors.white, fontSize: h5FontSize),
+                                  color: theme.getDefaultTextColor(),
+                                  fontSize: h5FontSize),
                             ),
                           ),
                         )
                       : AnimatedSwitcher(
                           duration: Duration(
                               milliseconds:
-                                  gameMode == GameMode.TwoPlayers ? 400 : 1000),
+                                  gameMode == GameMode.TwoPlayers ? 400 : 600),
                           transitionBuilder:
                               (Widget child, Animation<double> animation) =>
                                   FadeTransition(
@@ -419,7 +442,8 @@ class GameState extends State<GamePage> {
                             child: Text(
                               roundTooltip,
                               style: TextStyle(
-                                  color: Colors.white, fontSize: h5FontSize),
+                                  color: theme.getDefaultTextColor(),
+                                  fontSize: h5FontSize),
                             ),
                           ),
                         ),
@@ -448,7 +472,8 @@ class GameState extends State<GamePage> {
                                         child: Text(
                                           "Player 2",
                                           style: TextStyle(
-                                              color: Colors.white,
+                                              color:
+                                                  theme.getDefaultTextColor(),
                                               fontSize: h5FontSize),
                                         ),
                                       ),
@@ -464,7 +489,8 @@ class GameState extends State<GamePage> {
                                               pieceSize,
                                               pieceSize,
                                               pinSize,
-                                              Themes.p1Grey,
+                                              theme.getPieceNumberColor(),
+                                              theme.getPieceNumberPegColor(),
                                               p2Score,
                                               Player.P2),
                                         ),
@@ -474,20 +500,12 @@ class GameState extends State<GamePage> {
                                 ),
                               ),
                               AnimatedSwitcher(
-                                duration: Duration(
-                                    milliseconds:
-                                        gameMode == GameMode.TwoPlayers
-                                            ? 400
-                                            : 750),
+                                duration: Duration(milliseconds: 400),
                                 transitionBuilder: (Widget child,
                                         Animation<double> animation) =>
                                     SlideTransition(
                                         position: Tween<Offset>(
-                                          begin: Offset(
-                                              0.0,
-                                              gameMode == GameMode.TwoPlayers
-                                                  ? 1.0
-                                                  : 4.0),
+                                          begin: Offset(0.0, 1.0),
                                           end: Offset.zero,
                                         ).animate(animation),
                                         child: child),
@@ -499,7 +517,7 @@ class GameState extends State<GamePage> {
                                         ? "Your turn"
                                         : "Oponnent turn",
                                     style: TextStyle(
-                                        color: Colors.white,
+                                        color: theme.getDefaultTextColor(),
                                         fontSize: h5FontSize),
                                   ),
                                 ),

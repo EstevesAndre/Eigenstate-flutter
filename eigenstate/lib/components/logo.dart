@@ -1,3 +1,4 @@
+import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:eigenstate/services/piece.dart';
@@ -5,6 +6,8 @@ import 'package:eigenstate/services/piece.dart';
 class Logo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final theme = locator<Themes>();
+
     PieceService piece = PieceService.logo();
     final double pinSize = MediaQuery.of(context).size.height / 50;
     final double containerSize = MediaQuery.of(context).size.height / 4;
@@ -21,8 +24,8 @@ class Logo extends StatelessWidget {
             end: Alignment.bottomCenter,
             stops: [0.1, 0.65],
             colors: [
-              Themes.p1Grey,
-              Themes.p1Blue,
+              theme.getDefaultBackgroundGradientColor1(),
+              theme.getDefaultBackgroundGradientColor2(),
             ],
           ),
         ),
@@ -40,7 +43,7 @@ class Logo extends StatelessWidget {
                 BorderRadius.all(Radius.elliptical(borderRadius, borderRadius)),
             gradient: RadialGradient(
               radius: 0.04,
-              colors: [Colors.transparent, Colors.white],
+              colors: [Colors.transparent, theme.getHomePageButtonColor()],
               stops: [1, 1],
             ),
           ),

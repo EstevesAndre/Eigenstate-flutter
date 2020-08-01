@@ -24,6 +24,7 @@ class _GameTypeState extends State<GameType> {
   final soundService = locator<SoundService>();
   final alertService = locator<AlertService>();
   final adMobService = locator<AdMobService>();
+  final theme = locator<Themes>();
   AdmobInterstitial interstitialAd;
 
   @override
@@ -59,6 +60,7 @@ class _GameTypeState extends State<GameType> {
       child: Scaffold(
         body: Container(
           width: MediaQuery.of(context).size.width,
+          color: theme.getGameTypePageBackgroundColor(),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,7 +70,7 @@ class _GameTypeState extends State<GameType> {
                 child: Text(
                   "Game Type",
                   style: TextStyle(
-                      color: Colors.black,
+                      color: theme.getgameTypePageTitleColor(),
                       fontWeight: FontWeight.w700,
                       fontSize: h1FontSize,
                       fontFamily: 'DancingScript'),
@@ -84,7 +86,7 @@ class _GameTypeState extends State<GameType> {
                       child: Text(
                         "AI",
                         style: TextStyle(
-                            color: Colors.black,
+                            color: theme.getgameTypePageTitleColor(),
                             fontWeight: FontWeight.w500,
                             fontSize: h3FontSize,
                             fontFamily: 'DancingScript'),
@@ -111,11 +113,14 @@ class _GameTypeState extends State<GameType> {
                       height: btnHeight,
                       width: btnWidth,
                       borderRadius: 200,
-                      gradient: [Themes.p1Grey, Themes.p1Blue],
+                      gradient: [
+                        theme.getDefaultButtonGradientColor1(),
+                        theme.getDefaultButtonGradientColor2()
+                      ],
                       child: Text(
                         "Easy".toUpperCase(),
                         style: TextStyle(
-                            color: Colors.white,
+                            color: theme.getDefaultButtonTextColor(),
                             fontWeight: FontWeight.w700,
                             fontSize: h5FontSize),
                       ),
@@ -142,11 +147,14 @@ class _GameTypeState extends State<GameType> {
                       height: btnHeight,
                       width: btnWidth,
                       borderRadius: 200,
-                      gradient: [Themes.p1Grey, Themes.p1Blue],
+                      gradient: [
+                        theme.getDefaultButtonGradientColor1(),
+                        theme.getDefaultButtonGradientColor2()
+                      ],
                       child: Text(
                         "Medium".toUpperCase(),
                         style: TextStyle(
-                            color: Colors.white,
+                            color: theme.getDefaultButtonTextColor(),
                             fontWeight: FontWeight.w700,
                             fontSize: h5FontSize),
                       ),
@@ -173,11 +181,14 @@ class _GameTypeState extends State<GameType> {
                       height: btnHeight,
                       width: btnWidth,
                       borderRadius: 200,
-                      gradient: [Themes.p1Grey, Themes.p1Blue],
+                      gradient: [
+                        theme.getDefaultButtonGradientColor1(),
+                        theme.getDefaultButtonGradientColor2()
+                      ],
                       child: Text(
                         "Hard".toUpperCase(),
                         style: TextStyle(
-                            color: Colors.white,
+                            color: theme.getDefaultButtonTextColor(),
                             fontWeight: FontWeight.w700,
                             fontSize: h5FontSize),
                       ),
@@ -187,7 +198,7 @@ class _GameTypeState extends State<GameType> {
                       child: Text(
                         "Play with friends",
                         style: TextStyle(
-                            color: Colors.black,
+                            color: theme.getgameTypePageTitleColor(),
                             fontWeight: FontWeight.w500,
                             fontSize: h3FontSize,
                             fontFamily: 'DancingScript'),
@@ -213,11 +224,14 @@ class _GameTypeState extends State<GameType> {
                       height: btnHeight,
                       width: btnWidth,
                       borderRadius: 200,
-                      gradient: [Themes.p1Grey, Themes.p1Blue],
+                      gradient: [
+                        theme.getDefaultButtonGradientColor1(),
+                        theme.getDefaultButtonGradientColor2()
+                      ],
                       child: Text(
                         "2 Players".toUpperCase(),
                         style: TextStyle(
-                            color: Colors.white,
+                            color: theme.getDefaultButtonTextColor(),
                             fontWeight: FontWeight.w700,
                             fontSize: h5FontSize),
                       ),
@@ -248,13 +262,21 @@ class _GameTypeState extends State<GameType> {
           child: Text(
             "No",
             style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                color: theme.getDefaultButtonTextColor(),
+                fontSize: 20,
+                fontWeight: FontWeight.w700),
           ),
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: [Themes.p1Grey, Themes.p1Blue]),
+              stops: [
+                0.1,
+                0.8
+              ],
+              colors: [
+                theme.getDefaultButtonGradientColor1(),
+                theme.getDefaultButtonGradientColor2()
+              ]),
           radius: BorderRadius.circular(200),
           onPressed: () {
             boardService.setGameMode(GameMode.Solo);
@@ -285,13 +307,19 @@ class _GameTypeState extends State<GameType> {
           child: Text(
             "Yes",
             style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+                color: theme.getDefaultButtonTextColor(),
+                fontSize: 20,
+                fontWeight: FontWeight.w700),
           ),
           gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-              stops: [0.1, 0.8],
-              colors: [Themes.p1Grey, Themes.p1Blue]),
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            stops: [0.1, 0.8],
+            colors: [
+              theme.getDefaultButtonGradientColor1(),
+              theme.getDefaultButtonGradientColor2()
+            ],
+          ),
           radius: BorderRadius.circular(200),
           onPressed: () {
             soundService.playSound('sounds/click');
@@ -310,7 +338,9 @@ class _GameTypeState extends State<GameType> {
         child: Text(
           "Do you want to continue?",
           style: TextStyle(
-              color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+              color: theme.getDefaultPopupTextColor(),
+              fontSize: 15,
+              fontWeight: FontWeight.w500),
         ),
       ),
     ).show();

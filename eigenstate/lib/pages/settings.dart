@@ -17,6 +17,7 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   final boardService = locator<BoardService>();
   final soundService = locator<SoundService>();
+  final theme = locator<Themes>();
 
   Future<void> addBoolToSF(String key, bool value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -64,6 +65,7 @@ class SettingsPageState extends State<SettingsPage> {
           return Scaffold(
             body: Container(
               width: MediaQuery.of(context).size.width,
+              color: theme.getGameTypePageBackgroundColor(),
               child: Padding(
                 padding:
                     const EdgeInsets.symmetric(vertical: 15, horizontal: 20),
@@ -80,7 +82,7 @@ class SettingsPageState extends State<SettingsPage> {
                           Text(
                             "Settings".toUpperCase(),
                             style: TextStyle(
-                              color: Colors.black,
+                              color: theme.getgameTypePageTitleColor(),
                               fontWeight: FontWeight.w700,
                               fontSize: 30,
                             ),
@@ -96,7 +98,7 @@ class SettingsPageState extends State<SettingsPage> {
                         Text(
                           "Enable Sound",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: theme.getgameTypePageTitleColor(),
                             fontSize: 20,
                           ),
                         ),
@@ -107,7 +109,7 @@ class SettingsPageState extends State<SettingsPage> {
                             soundService.playSound('sounds/slide');
                           },
                           value: isSoundEnabled,
-                          activeColor: Themes.p1Orange,
+                          activeColor: theme.getDefaultButtonGradientColor2(),
                         ),
                       ],
                     ),
@@ -119,7 +121,7 @@ class SettingsPageState extends State<SettingsPage> {
                         Text(
                           "Board 3D effect",
                           style: TextStyle(
-                            color: Colors.black,
+                            color: theme.getgameTypePageTitleColor(),
                             fontSize: 20,
                           ),
                         ),
@@ -130,7 +132,7 @@ class SettingsPageState extends State<SettingsPage> {
                             soundService.playSound('sounds/slide');
                           },
                           value: isThirdDimensionEnabled,
-                          activeColor: Themes.p1Orange,
+                          activeColor: theme.getDefaultButtonGradientColor2(),
                         ),
                       ],
                     ),

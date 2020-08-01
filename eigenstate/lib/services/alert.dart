@@ -1,8 +1,11 @@
+import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/theme/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
 class AlertService {
+  final theme = locator<Themes>();
+  
   AlertStyle _resultAlertStyle;
   AlertStyle get resultAlertStyle => _resultAlertStyle;
 
@@ -15,8 +18,8 @@ class AlertService {
       isCloseButton: false,
       isOverlayTapDismiss: false,
       backgroundColor: Colors.white,
-      titleStyle: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700),
-      descStyle: TextStyle(fontSize: 17, color: Colors.black87),
+      titleStyle: TextStyle(color: theme.getDefaultPopupTextColor(), fontWeight: FontWeight.w700),
+      descStyle: TextStyle(fontSize: 17, color: theme.getDefaultPopupTextColor()),
       animationDuration: Duration(milliseconds: 600),
       buttonAreaPadding: EdgeInsets.all(12),
       overlayColor: Colors.black.withOpacity(.7),

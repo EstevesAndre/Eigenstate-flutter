@@ -18,6 +18,7 @@ class HomePage extends StatelessWidget {
   final boardService = locator<BoardService>();
   final soundService = locator<SoundService>();
   final alertService = locator<AlertService>();
+  final theme = locator<Themes>();
 
   HomePage({Key key}) : super(key: key);
 
@@ -41,8 +42,8 @@ class HomePage extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: [0.1, 0.65],
               colors: [
-                Themes.p1Grey,
-                Themes.p1Blue,
+                theme.getDefaultBackgroundGradientColor1(),
+                theme.getDefaultBackgroundGradientColor2(),
               ],
             )),
             child: Column(
@@ -58,7 +59,7 @@ class HomePage extends StatelessWidget {
                       Text(
                         "Eigenstate",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: theme.getHomePageTitleColor(),
                             fontSize: MediaQuery.of(context).size.width / 7,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'DancingScript'),
@@ -66,7 +67,7 @@ class HomePage extends StatelessWidget {
                       Text(
                         "Give it a try",
                         style: TextStyle(
-                            color: Colors.white,
+                            color: theme.getHomePageTitleColor(),
                             fontSize: MediaQuery.of(context).size.width / 17,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'DancingScript'),
@@ -98,11 +99,11 @@ class HomePage extends StatelessWidget {
                         height: btnSize,
                         width: btnSize,
                         borderRadius: 100,
-                        color: Colors.white,
+                        color: theme.getHomePageButtonColor(),
                         child: Icon(
                           Icons.play_arrow,
                           size: size8,
-                          color: Themes.p1Grey,
+                          color: theme.getHomePageButtonIconColor(),
                         ),
                       ),
                       SizedBox(height: 40),
@@ -111,9 +112,7 @@ class HomePage extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
                           Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal:
-                                    size20),
+                            padding: EdgeInsets.symmetric(horizontal: size20),
                             child: Btn(
                               onTap: () {
                                 boardService.gameMode$.add(GameMode.Solo);
@@ -126,21 +125,19 @@ class HomePage extends StatelessWidget {
                                   ),
                                 );
                               },
-                              color: Colors.white,
+                              color: theme.getHomePageButtonColor(),
                               height: size8,
                               width: size8,
                               borderRadius: 100,
                               child: Icon(
                                 Icons.settings,
                                 size: MediaQuery.of(context).size.width / 14,
-                                color: Themes.p1Grey,
+                                color: theme.getHomePageButtonIconColor(),
                               ),
                             ),
                           ),
                           Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal:
-                                    size20),
+                            padding: EdgeInsets.symmetric(horizontal: size20),
                             child: Btn(
                               onTap: () {
                                 boardService.gameMode$.add(GameMode.Solo);
@@ -153,14 +150,14 @@ class HomePage extends StatelessWidget {
                                   ),
                                 );
                               },
-                              color: Colors.white,
+                              color: theme.getHomePageButtonColor(),
                               height: size8,
                               width: size8,
                               borderRadius: 100,
                               child: Icon(
                                 Icons.help_outline,
                                 size: MediaQuery.of(context).size.width / 12,
-                                color: Themes.p1Grey,
+                                color: theme.getHomePageButtonIconColor(),
                               ),
                             ),
                           ),
