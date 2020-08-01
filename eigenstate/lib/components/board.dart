@@ -117,45 +117,7 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             boardService.waitingForAnswer$.add(true);
             WidgetsBinding.instance.addPostFrameCallback((_) => Future.delayed(
                 const Duration(seconds: 1),
-                () => Alert(
-                      context: context,
-                      title: state.value == Player.P1
-                          ? "Player 1 Won!"
-                          : "Player 2 Won!",
-                      style: alertService.resultAlertStyle,
-                      type: AlertType.success,
-                      buttons: [
-                        DialogButton(
-                          child: Text(
-                            "Continue".toUpperCase(),
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700),
-                          ),
-                          gradient: LinearGradient(
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                              stops: [0.1, 0.8],
-                              colors: [Themes.p1Grey, Themes.p1Blue]),
-                          radius: BorderRadius.circular(200),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            showRewardDialog();
-                          },
-                        )
-                      ],
-                      content: Padding(
-                        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
-                        child: Text(
-                          "Congratulations",
-                          style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w500),
-                        ),
-                      ),
-                    ).show()));
+                () => showWinDialog(state, gameMode)));
           }
 
           return Transform(
@@ -193,6 +155,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
                                       if (ret == 1) {
                                         showPiecePopUp(i, j, pieceHeight,
                                             piecePadding, pieceViewSize, item);
+                                      } else if (ret == 4) {
+                                        showWinDialog(state, gameMode);
                                       }
                                     },
                                     child: _buildBox(
@@ -365,6 +329,52 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
     });
   }
 
+  showWinDialog(MapEntry<BoardState, Player> state, GameMode gameMode) {
+    String title, desc;
+
+    if (gameMode == GameMode.TwoPlayers) {
+      title = state.value == Player.P1 ? "Player 1 Won!" : "Player 2 Won!";
+      desc = "Congratulations";
+    } else {
+      title = state.value == Player.P1 ? "You Won!" : "AI Won!";
+      desc = state.value == Player.P1 ? "Congratulations" : "Defeat me now";
+    }
+
+    return Alert(
+      context: context,
+      title: title,
+      style: alertService.resultAlertStyle,
+      type: AlertType.success,
+      buttons: [
+        DialogButton(
+          child: Text(
+            "Continue".toUpperCase(),
+            style: TextStyle(
+                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+          ),
+          gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              stops: [0.1, 0.8],
+              colors: [Themes.p1Grey, Themes.p1Blue]),
+          radius: BorderRadius.circular(200),
+          onPressed: () {
+            Navigator.pop(context);
+            gameMode == GameMode.TwoPlayers ? showEndGamePopUp() : showRewardDialog();
+          },
+        )
+      ],
+      content: Padding(
+        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
+        child: Text(
+          desc,
+          style: TextStyle(
+              color: Colors.black87, fontSize: 15, fontWeight: FontWeight.w500),
+        ),
+      ),
+    ).show();
+  }
+
   showRewardDialog() async {
     int tries = 0;
 
@@ -375,10 +385,22 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
       style: alertService.resultAlertStyle,
       buttons: [
         DialogButton(
-          child: Text(
-            "+ " + storeService.endGameBonus.toString(),
-            style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.toys,
+                color: Colors.redAccent,
+              ),
+              Text(
+                " +" + storeService.endGameBonus.toString(),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700),
+              ),
+            ],
           ),
           gradient: LinearGradient(
               begin: Alignment.centerLeft,
@@ -401,12 +423,22 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Icon(Icons.ondemand_video, color: Colors.white),
-              Text(
-                "+ " + storeService.rewardVideoBonus.toString(),
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.toys,
+                    color: Colors.redAccent,
+                  ),
+                  Text(
+                    " +" + storeService.endGameBonus.toString(),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ],
               ),
             ],
           ),

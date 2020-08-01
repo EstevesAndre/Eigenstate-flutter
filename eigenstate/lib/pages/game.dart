@@ -236,7 +236,7 @@ class GameState extends State<GamePage> {
                                             padding: EdgeInsets.fromLTRB(
                                                 0, 0, 0, 15),
                                             child: Text(
-                                              "Player",
+                                              "You",
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: h5FontSize),

@@ -825,7 +825,7 @@ class BoardService {
   }
 
   int handleClick(int i, int j) {
-    if (!inGame) return 0;
+    if (!inGame) return 4;
 
     if (checkWinner() != null) {
       nextTurn();
