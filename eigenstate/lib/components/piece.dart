@@ -6,20 +6,19 @@ import 'package:eigenstate/services/piece.dart';
 
 class Piece extends StatelessWidget {
   final double size;
+  final double pinSize;
   final Color color;
 
   final PieceService item;
 
-  Piece(this.size, this.color, this.item);
+  Piece(this.size, this.pinSize, this.color, this.item);
 
   @override
   Widget build(BuildContext context) {
-    return createPieceWidget(size, size, color, item, true);
+    return createPieceWidget(size, size, pinSize, color, item, true);
   }
 
-  static Widget _buildPin(int i, int j, Player p, Pin pin) {
-    double size = 4;
-
+  static Widget buildPin(int i, int j, double size, Player p, Pin pin) {
     return Container(
         height: size,
         width: size,
@@ -31,8 +30,8 @@ class Piece extends StatelessWidget {
         ));
   }
 
-  static Widget createPieceWidget(double width, double height, Color color,
-      PieceService item, bool isBoard) {
+  static Widget createPieceWidget(double width, double height, double pinSize,
+      Color color, PieceService item, bool isBoard) {
     return Container(
       height: height,
       width: width,
@@ -50,7 +49,7 @@ class Piece extends StatelessWidget {
                 offset: Offset(1.0, 1.0))
           ]),
       child: Container(
-        margin: EdgeInsets.all(4),
+        margin: EdgeInsets.all(pinSize),
         alignment: Alignment.center,
         child: Column(
           mainAxisSize: MainAxisSize.max,
@@ -70,16 +69,17 @@ class Piece extends StatelessWidget {
                             j,
                             i == 2 && j == 2 && isBoard
                                 ? Container(
-                                    height: 4,
-                                    width: 4,
+                                    height: pinSize,
+                                    width: pinSize,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(4),
                                       color: Themes.p1Orange,
                                     ),
                                   )
                                 : !isBoard && it == Pin.Disable
-                                    ? Container(width: 4, height: 4)
-                                    : _buildPin(i, j, item.own$.value, it),
+                                    ? Container(width: pinSize, height: pinSize)
+                                    : buildPin(
+                                        i, j, pinSize, item.own$.value, it),
                           ),
                         )
                         .values
@@ -94,9 +94,9 @@ class Piece extends StatelessWidget {
     );
   }
 
-  static Widget scorePiece(
-      double width, double height, Color color, int number, Player p) {
+  static Widget scorePiece(double width, double height, double pinSize,
+      Color color, int number, Player p) {
     PieceService ps = PieceService.number(number, p);
-    return createPieceWidget(width, height, color, ps, false);
+    return createPieceWidget(width, height, pinSize, color, ps, false);
   }
 }

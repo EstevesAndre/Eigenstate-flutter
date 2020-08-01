@@ -10,6 +10,7 @@ import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/services/board.dart';
 import 'package:eigenstate/services/alert.dart';
 import 'package:eigenstate/services/piece.dart';
+import 'package:eigenstate/services/store.dart';
 import 'package:eigenstate/services/admob.dart';
 
 import 'package:eigenstate/theme/theme.dart';
@@ -21,12 +22,11 @@ class Board extends StatefulWidget {
 }
 
 class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
-  GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
-
   final debugMode = true;
   final boardService = locator<BoardService>();
   final alertService = locator<AlertService>();
   final adMobService = locator<AdMobService>();
+  final storeService = locator<StoreService>();
   AdmobInterstitial interstitialAd;
   AdmobReward rewardAd;
 
@@ -60,40 +60,41 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
   }
 
   void handleEvent(
-      AdmobAdEvent event, Map<String, dynamic> args, String adType) {
+      AdmobAdEvent event, Map<String, dynamic> args, String adType) async {
+    print(event);
     switch (event) {
-      case AdmobAdEvent.loaded:
-        showSnackBar('New Admob $adType Ad loaded!');
-        break;
-      case AdmobAdEvent.opened:
-        showSnackBar('Admob $adType Ad opened!');
-        break;
       case AdmobAdEvent.closed:
-        showSnackBar('Admob $adType Ad closed!');
-        break;
-      case AdmobAdEvent.failedToLoad:
-        showSnackBar('Admob $adType failed to load. :(');
-        break;
-      case AdmobAdEvent.rewarded:
-        print("HEREEE");
-        // TODO add coins to "store"
+        if (adType == "Interstitial") {
+          storeService.addRewardIntToSF("coins", "WinReward");
+        } else if (adType == "Reward") {
+          print("Reward closed");
+          storeService.addRewardIntToSF("coins", "VideoReward");
+        }
         break;
       default:
     }
   }
 
-  void showSnackBar(String content) {
-    scaffoldState.currentState.showSnackBar(SnackBar(
-      content: Text(content),
-      duration: Duration(milliseconds: 1500),
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
-    final bool hasTransform = boardService.thirdDimension$.value;
+    final bool hasTransform = !boardService.thirdDimension$.value;
     final GameMode gameMode = boardService.getGameMode();
-    bool waitingForAnswer = false;
+
+    double pieceHeight = MediaQuery.of(context).size.width / 1.4;
+    double piecePadding = MediaQuery.of(context).size.width / 15.7;
+    double pieceViewSize = MediaQuery.of(context).size.width / 19.64;
+    double pieceSize;
+    double pinSize;
+
+    if (MediaQuery.of(context).size.aspectRatio > 0.6) {
+      pieceSize =
+          MediaQuery.of(context).size.width / (9 + (hasTransform ? 2 : 0));
+      pinSize = MediaQuery.of(context).size.width / 110;
+    } else {
+      pieceSize =
+          MediaQuery.of(context).size.width / (8 + (hasTransform ? 1 : 0));
+      pinSize = MediaQuery.of(context).size.width / 100;
+    }
 
     return StreamBuilder<
             MapEntry<List<List<PieceService>>, MapEntry<BoardState, Player>>>(
@@ -111,8 +112,9 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           final List<List<PieceService>> board = snapshot.data.key;
           final MapEntry<BoardState, Player> state = snapshot.data.value;
 
-          if (state.key == BoardState.EndGame && !waitingForAnswer) {
-            waitingForAnswer = true;
+          if (state.key == BoardState.EndGame &&
+              !boardService.waitingForAnswer$.value) {
+            boardService.waitingForAnswer$.add(true);
             WidgetsBinding.instance.addPostFrameCallback((_) => Future.delayed(
                 const Duration(seconds: 1),
                 () => Alert(
@@ -189,10 +191,12 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
 
                                       int ret = boardService.handleClick(i, j);
                                       if (ret == 1) {
-                                        showPiecePopUp(i, j, item);
+                                        showPiecePopUp(i, j, pieceHeight,
+                                            piecePadding, pieceViewSize, item);
                                       }
                                     },
-                                    child: _buildBox(i, j, item),
+                                    child: _buildBox(
+                                        i, j, item, pieceSize, pinSize),
                                   ),
                                 ),
                               )
@@ -209,10 +213,10 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
         });
   }
 
-  Widget _buildBox(int i, int j, PieceService item) {
+  Widget _buildBox(
+      int i, int j, PieceService item, double pieceSize, double pinSize) {
     BoxBorder border = Border();
     BorderSide borderStyle = BorderSide(width: 3, color: Colors.black26);
-    double size = 50;
 
     border = Border(
         top: i == 0 ? borderStyle : BorderSide.none,
@@ -229,8 +233,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           color: (i + j) % 2 == 0 ? Themes.p1Orange : Themes.p1Orange2,
           border: border,
         ),
-        height: size,
-        width: size,
+        height: pieceSize,
+        width: pieceSize,
         child: AnimatedContainer(
           duration: Duration(milliseconds: 750),
           color: item.toAnimate$.value
@@ -241,7 +245,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             child: item.own$.value == null
                 ? null
                 : Piece(
-                    size * 5 / 6,
+                    pieceSize * 5 / 6,
+                    pinSize,
                     item.own$.value == Player.P1
                         ? Themes.p1Blue
                         : Themes.p1Grey,
@@ -252,7 +257,7 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
     );
   }
 
-  Widget _buildPin(int i, int j, double size, Player p, Pin pin) {
+  Widget buildPin(int i, int j, double size, Player p, Pin pin) {
     return Container(
         height: size,
         width: size,
@@ -264,9 +269,9 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
         ));
   }
 
-  showPiecePopUp(int i, int j, PieceService item) async {
+  showPiecePopUp(int i, int j, double pieceHeight, double piecePadding,
+      double pieceSize, PieceService item) async {
     Player p = item.own$.value;
-    double size = 20;
 
     await showDialog(
       context: context,
@@ -275,7 +280,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
         contentPadding: EdgeInsets.all(0),
         content: Container(
-          height: 280,
+          height: pieceHeight,
+          width: pieceHeight,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.all(Radius.elliptical(5, 5)),
             gradient: RadialGradient(
@@ -294,7 +300,7 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             ],
           ),
           child: Container(
-            margin: EdgeInsets.all(25),
+            margin: EdgeInsets.all(piecePadding),
             alignment: Alignment.center,
             child: Column(
               mainAxisSize: MainAxisSize.max,
@@ -325,20 +331,21 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
                                       Navigator.pop(context);
                                     else if (ret == 3) {
                                       Navigator.pop(context);
-                                      showPiecePopUp(i, j, item);
+                                      showPiecePopUp(i, j, pieceHeight,
+                                          piecePadding, pieceSize, item);
                                     }
                                   },
                                   child: i == 2 && j == 2
                                       ? Container(
-                                          width: size,
-                                          height: size,
+                                          width: pieceSize,
+                                          height: pieceSize,
                                           decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(4),
+                                            borderRadius: BorderRadius.circular(
+                                                pieceSize),
                                             color: Themes.p1Orange,
                                           ),
                                         )
-                                      : _buildPin(i, j, size, p, pin),
+                                      : buildPin(i, j, pieceSize, p, pin),
                                 ),
                               ),
                             )
@@ -359,6 +366,8 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
   }
 
   showRewardDialog() async {
+    int tries = 0;
+
     Alert(
       context: context,
       title: "Nice job",
@@ -367,7 +376,7 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
       buttons: [
         DialogButton(
           child: Text(
-            "+ 40",
+            "+ " + storeService.endGameBonus.toString(),
             style: TextStyle(
                 color: Colors.white, fontSize: 20, fontWeight: FontWeight.w700),
           ),
@@ -384,8 +393,6 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             if (await interstitialAd.isLoaded) {
               interstitialAd.show();
               showEndGamePopUp();
-            } else {
-              showSnackBar("Interstitial ad is still loading...");
             }
           },
         ),
@@ -395,7 +402,7 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
             children: [
               Icon(Icons.ondemand_video, color: Colors.white),
               Text(
-                "+ 120",
+                "+ " + storeService.rewardVideoBonus.toString(),
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 20,
@@ -411,13 +418,20 @@ class _BoardState extends State<Board> with SingleTickerProviderStateMixin {
           radius: BorderRadius.circular(200),
           onPressed: () async {
             soundService.playSound('sounds/click');
-            Navigator.pop(context);
 
             if (await rewardAd.isLoaded) {
+              Navigator.pop(context);
               rewardAd.show();
               showEndGamePopUp();
             } else {
-              showSnackBar("Reward ad is still loading...");
+              tries++;
+              print("Reward video is still loading... " + tries.toString());
+
+              if (tries == 3) {
+                Navigator.pop(context);
+                interstitialAd.show();
+                showEndGamePopUp();
+              }
             }
           },
         ),

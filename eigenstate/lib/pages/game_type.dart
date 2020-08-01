@@ -20,9 +20,6 @@ class GameType extends StatefulWidget {
 }
 
 class _GameTypeState extends State<GameType> {
-  GlobalKey<ScaffoldState> scaffoldState = GlobalKey();
-
-  final debugMode = false;
   final boardService = locator<BoardService>();
   final soundService = locator<SoundService>();
   final alertService = locator<AlertService>();
@@ -37,35 +34,8 @@ class _GameTypeState extends State<GameType> {
         adUnitId: adMobService.getInterstitialAdId(),
         listener: (AdmobAdEvent event, Map<String, dynamic> args) {
           if (event == AdmobAdEvent.closed) interstitialAd.load();
-          if (debugMode) handleEvent(event, args, "Interstitial");
         })
       ..load();
-  }
-
-  void handleEvent(
-      AdmobAdEvent event, Map<String, dynamic> args, String adType) {
-    switch (event) {
-      case AdmobAdEvent.loaded:
-        showSnackBar('New Admob $adType Ad loaded!');
-        break;
-      case AdmobAdEvent.opened:
-        showSnackBar('Admob $adType Ad opened!');
-        break;
-      case AdmobAdEvent.closed:
-        showSnackBar('Admob $adType Ad closed!');
-        break;
-      case AdmobAdEvent.failedToLoad:
-        showSnackBar('Admob $adType failed to load. :(');
-        break;
-      default:
-    }
-  }
-
-  void showSnackBar(String content) {
-    scaffoldState.currentState.showSnackBar(SnackBar(
-      content: Text(content),
-      duration: Duration(milliseconds: 1500),
-    ));
   }
 
   @override
@@ -77,24 +47,18 @@ class _GameTypeState extends State<GameType> {
   @override
   Widget build(BuildContext context) {
     final bool inGame = boardService.checkGameInProgress();
-    print("In Game: " + inGame.toString());
+
+    final h1FontSize = MediaQuery.of(context).size.width / 8;
+    final h3FontSize = MediaQuery.of(context).size.width / 13;
+    final h5FontSize = MediaQuery.of(context).size.width / 25;
+
+    final btnWidth = MediaQuery.of(context).size.width / 1.8;
+    final btnHeight = MediaQuery.of(context).size.height / 15;
 
     return SafeArea(
       child: Scaffold(
-        key: scaffoldState,
         body: Container(
           width: MediaQuery.of(context).size.width,
-//          decoration: BoxDecoration(
-//              gradient: LinearGradient(
-//                begin: Alignment.topCenter,
-//                end: Alignment.bottomCenter,
-//                stops: [0.1, 0.65],
-//                colors: [
-//                  Themes.p1Grey,
-//                  Themes.p1Blue,
-//                ],
-//              )
-//          ),
           child: Column(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -106,7 +70,7 @@ class _GameTypeState extends State<GameType> {
                   style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w700,
-                      fontSize: 40,
+                      fontSize: h1FontSize,
                       fontFamily: 'DancingScript'),
                 ),
               ),
@@ -122,7 +86,7 @@ class _GameTypeState extends State<GameType> {
                         style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
-                            fontSize: 30,
+                            fontSize: h3FontSize,
                             fontFamily: 'DancingScript'),
                       ),
                     ),
@@ -144,8 +108,8 @@ class _GameTypeState extends State<GameType> {
                           );
                         }
                       },
-                      height: 40,
-                      width: 220,
+                      height: btnHeight,
+                      width: btnWidth,
                       borderRadius: 200,
                       gradient: [Themes.p1Grey, Themes.p1Blue],
                       child: Text(
@@ -153,7 +117,7 @@ class _GameTypeState extends State<GameType> {
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 16),
+                            fontSize: h5FontSize),
                       ),
                     ),
                     SizedBox(height: 25),
@@ -175,8 +139,8 @@ class _GameTypeState extends State<GameType> {
                           );
                         }
                       },
-                      height: 40,
-                      width: 220,
+                      height: btnHeight,
+                      width: btnWidth,
                       borderRadius: 200,
                       gradient: [Themes.p1Grey, Themes.p1Blue],
                       child: Text(
@@ -184,7 +148,7 @@ class _GameTypeState extends State<GameType> {
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 16),
+                            fontSize: h5FontSize),
                       ),
                     ),
                     SizedBox(height: 25),
@@ -206,8 +170,8 @@ class _GameTypeState extends State<GameType> {
                           );
                         }
                       },
-                      height: 40,
-                      width: 220,
+                      height: btnHeight,
+                      width: btnWidth,
                       borderRadius: 200,
                       gradient: [Themes.p1Grey, Themes.p1Blue],
                       child: Text(
@@ -215,7 +179,7 @@ class _GameTypeState extends State<GameType> {
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 16),
+                            fontSize: h5FontSize),
                       ),
                     ),
                     Container(
@@ -225,7 +189,7 @@ class _GameTypeState extends State<GameType> {
                         style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
-                            fontSize: 30,
+                            fontSize: h3FontSize,
                             fontFamily: 'DancingScript'),
                       ),
                     ),
@@ -246,8 +210,8 @@ class _GameTypeState extends State<GameType> {
                           );
                         }
                       },
-                      height: 40,
-                      width: 220,
+                      height: btnHeight,
+                      width: btnWidth,
                       borderRadius: 200,
                       gradient: [Themes.p1Grey, Themes.p1Blue],
                       child: Text(
@@ -255,7 +219,7 @@ class _GameTypeState extends State<GameType> {
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.w700,
-                            fontSize: 16),
+                            fontSize: h5FontSize),
                       ),
                     ),
                   ],
@@ -265,11 +229,6 @@ class _GameTypeState extends State<GameType> {
                 child: AdmobBanner(
                   adUnitId: adMobService.getBannerAdId(),
                   adSize: AdmobBannerSize.FULL_BANNER,
-                  listener: debugMode
-                      ? (AdmobAdEvent event, Map<String, dynamic> args) {
-                          handleEvent(event, args, 'Banner');
-                        }
-                      : null,
                 ),
               ),
             ],
@@ -298,6 +257,8 @@ class _GameTypeState extends State<GameType> {
               colors: [Themes.p1Grey, Themes.p1Blue]),
           radius: BorderRadius.circular(200),
           onPressed: () {
+            boardService.setGameMode(GameMode.Solo);
+
             if (gameType == "Easy")
               boardService.setGameDifficulty(Difficulty.Easy);
             else if (gameType == "Medium")
@@ -345,7 +306,7 @@ class _GameTypeState extends State<GameType> {
         ),
       ],
       content: Padding(
-        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
+        padding: EdgeInsets.fromLTRB(15, 30, 15, 15),
         child: Text(
           "Do you want to continue?",
           style: TextStyle(

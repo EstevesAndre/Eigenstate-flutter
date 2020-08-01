@@ -23,6 +23,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final btnSize = MediaQuery.of(context).size.width / 5;
+    final size8 = MediaQuery.of(context).size.width / 8;
+    final size20 = MediaQuery.of(context).size.width / 20;
+
     return WillPopScope(
       onWillPop: () {
         return Future.value(false);
@@ -43,18 +47,19 @@ class HomePage extends StatelessWidget {
             )),
             child: Column(
               mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Flexible(
-                  flex: 1,
+                  flex: 3,
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
                       Text(
                         "Eigenstate",
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 65,
+                            fontSize: MediaQuery.of(context).size.width / 7,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'DancingScript'),
                       ),
@@ -62,7 +67,7 @@ class HomePage extends StatelessWidget {
                         "Give it a try",
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 25,
+                            fontSize: MediaQuery.of(context).size.width / 17,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'DancingScript'),
                       ),
@@ -72,10 +77,10 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 Flexible(
-                  flex: 1,
+                  flex: 2,
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       SizedBox(height: 50),
                       Btn(
@@ -90,64 +95,78 @@ class HomePage extends StatelessWidget {
                             ),
                           );
                         },
-                        height: 130,
-                        width: 130,
-                        borderRadius: 250,
+                        height: btnSize,
+                        width: btnSize,
+                        borderRadius: 100,
                         color: Colors.white,
                         child: Icon(
                           Icons.play_arrow,
-                          size: 70.0,
+                          size: size8,
                           color: Themes.p1Grey,
                         ),
                       ),
-                      SizedBox(height: 80),
+                      SizedBox(height: 40),
                       Row(
                         mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Btn(
-                            onTap: () {
-                              boardService.gameMode$.add(GameMode.Solo);
-                              soundService.playSound('sounds/click');
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    size20),
+                            child: Btn(
+                              onTap: () {
+                                boardService.gameMode$.add(GameMode.Solo);
+                                soundService.playSound('sounds/click');
 
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => SettingsPage(),
-                                ),
-                              );
-                            },
-                            color: Colors.white,
-                            height: 50,
-                            width: 50,
-                            borderRadius: 25,
-                            child: Icon(
-                              Icons.settings,
-                              color: Themes.p1Grey,
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => SettingsPage(),
+                                  ),
+                                );
+                              },
+                              color: Colors.white,
+                              height: size8,
+                              width: size8,
+                              borderRadius: 100,
+                              child: Icon(
+                                Icons.settings,
+                                size: MediaQuery.of(context).size.width / 14,
+                                color: Themes.p1Grey,
+                              ),
                             ),
                           ),
-                          SizedBox(width: 150),
-                          Btn(
-                            onTap: () {
-                              boardService.gameMode$.add(GameMode.Solo);
-                              soundService.playSound('sounds/click');
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    size20),
+                            child: Btn(
+                              onTap: () {
+                                boardService.gameMode$.add(GameMode.Solo);
+                                soundService.playSound('sounds/click');
 
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => HowToPlayPage(),
-                                ),
-                              );
-                            },
-                            color: Colors.white,
-                            height: 50,
-                            width: 50,
-                            borderRadius: 25,
-                            child: Icon(Icons.help_outline,
-                                size: 40.0, color: Themes.p1Grey),
+                                Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                    builder: (context) => HowToPlayPage(),
+                                  ),
+                                );
+                              },
+                              color: Colors.white,
+                              height: size8,
+                              width: size8,
+                              borderRadius: 100,
+                              child: Icon(
+                                Icons.help_outline,
+                                size: MediaQuery.of(context).size.width / 12,
+                                color: Themes.p1Grey,
+                              ),
+                            ),
                           ),
                         ],
                       ),
+                      SizedBox(height: 10),
                     ],
                   ),
                 ),

@@ -15,8 +15,7 @@ class AlertService {
       isCloseButton: false,
       isOverlayTapDismiss: false,
       backgroundColor: Colors.white,
-      titleStyle: TextStyle(
-          color: Colors.black87, fontWeight: FontWeight.w700, fontSize: 20),
+      titleStyle: TextStyle(color: Colors.black87, fontWeight: FontWeight.w700),
       descStyle: TextStyle(fontSize: 17, color: Colors.black87),
       animationDuration: Duration(milliseconds: 600),
       buttonAreaPadding: EdgeInsets.all(12),

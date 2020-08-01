@@ -7,9 +7,11 @@ import 'package:rxdart/rxdart.dart';
 import 'package:eigenstate/services/provider.dart';
 import 'package:eigenstate/services/piece.dart';
 import 'package:eigenstate/services/sound.dart';
+import 'package:eigenstate/services/store.dart';
 import 'package:eigenstate/services/coord.dart';
 
 final soundService = locator<SoundService>();
+final storeService = locator<StoreService>();
 
 enum Player { P1, P2 }
 enum BoardState { EndGame, Play }
@@ -29,8 +31,9 @@ class BoardService {
   BehaviorSubject<List<List<PieceService>>> _board$;
   BehaviorSubject<List<List<PieceService>>> get board$ => _board$;
 
-  BehaviorSubject<MapEntry<int, Player>> _rounds$;
-  BehaviorSubject<MapEntry<int, Player>> get rounds$ => _rounds$;
+  BehaviorSubject<MapEntry<MapEntry<int, Player>, String>> _rounds$;
+  BehaviorSubject<MapEntry<MapEntry<int, Player>, String>> get rounds$ =>
+      _rounds$;
 
   BehaviorSubject<MapEntry<BoardState, Player>> _boardState$;
   BehaviorSubject<MapEntry<BoardState, Player>> get boardState$ => _boardState$;
@@ -46,6 +49,9 @@ class BoardService {
 
   BehaviorSubject<bool> _thirdDimension$;
   BehaviorSubject<bool> get thirdDimension$ => _thirdDimension$;
+
+  BehaviorSubject<bool> _waitingForAnswer$;
+  BehaviorSubject<bool> get waitingForAnswer$ => _waitingForAnswer$;
 
   Player _start;
   Player _second;
@@ -66,21 +72,23 @@ class BoardService {
     _initStreams();
   }
 
-  String getGameDifficulty() {
+  MapEntry<int, String> getGameDifficulty() {
     switch (_gameDifficulty$.value) {
       case Difficulty.Easy:
-        return "Easy";
+        return MapEntry(1, "Easy");
       case Difficulty.Medium:
-        return "Medium";
+        return MapEntry(2, "Medium");
       case Difficulty.Hard:
-        return "Hard";
+        return MapEntry(3, "Hard");
       default:
-        return "ERROR";
+        return MapEntry(0, "ERROR");
     }
   }
 
   void setGameDifficulty(Difficulty difficulty) {
     _gameDifficulty$.add(difficulty);
+
+    updateGameBonusses();
   }
 
   void setGameMode(GameMode gm) {
@@ -98,7 +106,7 @@ class BoardService {
   }
 
   Player getPlaying() {
-    return _rounds$.value.value;
+    return _rounds$.value.key.value;
   }
 
   GameMode getGameMode() {
@@ -157,6 +165,7 @@ class BoardService {
     if (p != null && inGame) {
       print("GANHOUU");
       print(p);
+      _rounds$.add(MapEntry(_rounds$.value.key, "Game finished"));
 
       if (p == Player.P1)
         _score$.add(MapEntry(score$.value.key + 1, score$.value.value));
@@ -170,13 +179,13 @@ class BoardService {
 
     print("New Turn");
 
-    int round = _rounds$.value.key;
+    int round = _rounds$.value.key.key;
     Player actual = getPlaying();
 
     if (_start == actual) {
-      _rounds$.add(MapEntry(round, _second));
+      _rounds$.add(MapEntry(MapEntry(round, _second), "Move a piece"));
     } else {
-      _rounds$.add(MapEntry(round + 1, _start));
+      _rounds$.add(MapEntry(MapEntry(round + 1, _start), "Move a piece"));
     }
 
     turnPhase = Phase.ChoosePieceToMove;
@@ -594,7 +603,7 @@ class BoardService {
           if (insertPinToGetPiece()) {
           } else if (_p2Pieces.length <= 3 &&
               _p1Pieces.length >= 3 &&
-              rounds$.value.key > 8)
+              _rounds$.value.key.key > 8)
             insertRandomPiecePin(true);
           else
             insertRandomPiecePin(false);
@@ -843,6 +852,7 @@ class BoardService {
           changePossiblePieceDestinations(false);
           executeMove(i, j);
           turnPhase = Phase.ChoosePieceToPin;
+          _rounds$.add(MapEntry(_rounds$.value.key, "Choose two pegs"));
 
           if (checkWinner() != null) {
             nextTurn();
@@ -947,44 +957,45 @@ class BoardService {
     print("Reset Board\n");
 
     setPlayerStart();
-    _rounds$.add(MapEntry(1, _start));
+    _rounds$.add(MapEntry(MapEntry(1, _start), "Move a piece"));
+    _waitingForAnswer$.add(false);
 
     _board$.add([
       [
         PieceService(6, Player.P2, Player.P2 == _start),
-        PieceService(5, Player.P2, Player.P2 == _start),
-        PieceService(4, Player.P2, Player.P2 == _start),
-        PieceService(3, Player.P2, Player.P2 == _start),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
         PieceService(2, Player.P2, Player.P2 == _start),
-        PieceService(1, Player.P2, Player.P2 == _start)
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
         PieceService.empty(),
         PieceService.empty(),
         PieceService.empty(),
@@ -1022,6 +1033,25 @@ class BoardService {
     return inGame;
   }
 
+  void updateGameBonusses() {
+    if (gameMode$.value != GameMode.TwoPlayers) {
+      switch (_gameDifficulty$.value) {
+        case Difficulty.Easy:
+          storeService.setBonuses(12, 36);
+          break;
+        case Difficulty.Medium:
+          storeService.setBonuses(24, 48);
+          break;
+        case Difficulty.Hard:
+          storeService.setBonuses(36, 60);
+          break;
+        default:
+      }
+      print(storeService.endGameBonus);
+      print(storeService.rewardVideoBonus);
+    }
+  }
+
   void setInGame(bool b) {
     inGame = b;
   }
@@ -1038,39 +1068,39 @@ class BoardService {
     _board$ = BehaviorSubject<List<List<PieceService>>>.seeded([
       [
         PieceService(6, Player.P2, Player.P2 == _start),
-        PieceService(5, Player.P2, Player.P2 == _start),
-        PieceService(4, Player.P2, Player.P2 == _start),
-        PieceService(3, Player.P2, Player.P2 == _start),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty(),
+        PieceService.empty()
+      ],
+      [
+        PieceService.empty(),
         PieceService(2, Player.P2, Player.P2 == _start),
-        PieceService(1, Player.P2, Player.P2 == _start)
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty(),
-        PieceService.empty()
-      ],
-      [
-        PieceService.empty(),
-        PieceService.empty(),
         PieceService.empty(),
         PieceService.empty(),
         PieceService.empty(),
@@ -1086,8 +1116,8 @@ class BoardService {
       ]
     ]);
 
-    _rounds$ =
-        BehaviorSubject<MapEntry<int, Player>>.seeded(MapEntry(1, Player.P1));
+    _rounds$ = BehaviorSubject<MapEntry<MapEntry<int, Player>, String>>.seeded(
+        MapEntry(MapEntry(1, Player.P1), "Move a Piece"));
 
     _boardState$ = BehaviorSubject<MapEntry<BoardState, Player>>.seeded(
         MapEntry(BoardState.Play, null));
@@ -1100,11 +1130,14 @@ class BoardService {
 
     _thirdDimension$ = BehaviorSubject<bool>.seeded(true);
 
+    _waitingForAnswer$ = BehaviorSubject<bool>.seeded(false);
+
     turnPhase = Phase.ChoosePieceToMove;
     piece = Coordinate.origin();
     pinsSelected = 0;
     inGame = false;
 
     updatePlayersPieces();
+    updateGameBonusses();
   }
 }

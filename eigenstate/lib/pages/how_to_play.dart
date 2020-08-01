@@ -9,6 +9,15 @@ class HowToPlayPage extends StatefulWidget {
 class HowToPlayState extends State<HowToPlayPage> {
   @override
   Widget build(BuildContext context) {
+    final h1FontSize = MediaQuery.of(context).size.width / 7;
+    final h4FontSize = MediaQuery.of(context).size.width / 19;
+    final h5FontSize = MediaQuery.of(context).size.width / 23;
+    final h6FontSize = MediaQuery.of(context).size.width / 26;
+
+    final my5Size = MediaQuery.of(context).size.width / 30;
+    final my3Size = MediaQuery.of(context).size.width / 20;
+    final my2Size = MediaQuery.of(context).size.width / 10;
+
     return SafeArea(
       child: Scaffold(
         body: Container(
@@ -32,37 +41,37 @@ class HowToPlayState extends State<HowToPlayPage> {
                   shrinkWrap: true,
                   children: <Widget>[
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 30),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20, vertical: my3Size),
                       alignment: Alignment.center,
                       child: Text(
                         "How to play",
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 55,
+                            fontSize: h1FontSize,
                             fontWeight: FontWeight.w700,
                             fontFamily: "DancingScript"),
                       ),
                     ),
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 30, vertical: my5Size),
                       child: Text(
                         "      Eigenstate is a two-player abstract strategy game with incredibly simple rules that grows in complexity as you play.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 50),
+                      padding: EdgeInsets.fromLTRB(50, 0, 50, my5Size),
                       alignment: Alignment.centerLeft,
                       child: Text(
                         "Rules",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: h4FontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -74,24 +83,24 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "Setup",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: h5FontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 30, vertical: my5Size),
                       child: Text(
                         "      Each player have sic pieces and each one has twenty five pins. Every piece starts with two pin in it: pin in the center represents its position on the board, and one additional allowing the piece to move one space forward.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(50, 0, 50, 30),
+                      padding: EdgeInsets.fromLTRB(50, 0, 50, my3Size),
                       child: Image.asset('assets/images/board.png'),
                     ),
                     Container(
@@ -101,19 +110,18 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "Gameplay",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: h5FontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding: EdgeInsets.fromLTRB(30, my5Size, 30, my3Size),
                       child: Text(
                         "      On a player's turn, in this order, if possible, they must:\n  1.  Firstly, move one of their pieces.\n  2. Then place two pins in any of their pieces.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -124,33 +132,33 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "Piece Movement",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: h5FontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 10, 30, 0),
+                      padding: EdgeInsets.fromLTRB(30, my5Size, 30, 0),
                       child: Text(
                         "      All pins in a piece other than the center pins represent the possible moves that piece can take, relative to its position on the board, (represented by its center pin).",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 0, 30, 10),
+                      padding: EdgeInsets.fromLTRB(30, my5Size, 30, my3Size),
                       child: Text(
                         "      For example, the board below, the black player has taken their first turn. He moved piece (1), and then added a pin to that piece, as well as in another piece (2). In subsequent turns, that piece (1) can now potentially move to spaces (a) and (b), and piece (2) to spaces (c), and (d).",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(50, 0, 50, 30),
+                      padding: EdgeInsets.fromLTRB(50, 0, 50, my3Size),
                       child: Image.asset('assets/images/movement.png'),
                     ),
                     Container(
@@ -160,18 +168,18 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "Constraints",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: h5FontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 10, 30, 0),
+                      padding: EdgeInsets.fromLTRB(30, my5Size, 30, 0),
                       child: Text(
                         "      - Pins are never removed from a piece, so each piece will always be able to move one space forward throughout the game.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -182,7 +190,7 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "      - Pieces can jump over other pieces.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -193,7 +201,7 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "      - Pieces cannot move off the game board.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -204,7 +212,7 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "      - Pieces do not rotate.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -215,17 +223,17 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "      - A piece cannot move backwards unless there is a pin behind the piece's center pin.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 0, 30, 10),
+                      padding: EdgeInsets.fromLTRB(30, 0, 30, my3Size),
                       child: Text(
                         "      - When a piece is moved onto another piece, the other piece is removed from the game. Yes, it is possible to capture your own pieces. Though it's probably a bad idea.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -236,18 +244,18 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "Pin Placement",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: h5FontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 10, 30, 0),
+                      padding: EdgeInsets.fromLTRB(30, my5Size, 30, 0),
                       child: Text(
                         "      Pins have to be placed into empty holes in your own pieces, and only into pieces that have not yet been captured.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -258,17 +266,17 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "      - You can place your two pins on different pieces on the same turn.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 0, 30, 10),
+                      padding: EdgeInsets.fromLTRB(30, 0, 30, my3Size),
                       child: Text(
                         "      - You do not need to place either of the pins on the piece you just moved.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
@@ -279,28 +287,28 @@ class HowToPlayState extends State<HowToPlayPage> {
                         "Goal",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: h5FontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 10, 30, 0),
+                      padding: EdgeInsets.fromLTRB(30, my5Size, 30, 0),
                       child: Text(
                         "      If you reduce your opponent to just one piece remaining, you win the game.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
                     Container(
-                      padding: EdgeInsets.fromLTRB(30, 10, 30, 50),
+                      padding: EdgeInsets.fromLTRB(30, my5Size, 30, my2Size),
                       child: Text(
                         "      Secondary goal: In a game where both players have exactly two pieces remaining, a player may instead win the game by filling one of their remaining pieces with pins.",
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 15,
+                          fontSize: h6FontSize,
                         ),
                       ),
                     ),
