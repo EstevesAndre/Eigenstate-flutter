@@ -38,6 +38,19 @@ class PieceService {
     _pieceMoved$ = BehaviorSubject<bool>.seeded(false);
   }
 
+  PieceService.logo() {
+    _own$ = BehaviorSubject<Player>.seeded(Player.P1);
+    _piece$ = BehaviorSubject<List<List<Pin>>>.seeded([
+      [Pin.Active, Pin.Disable, Pin.Active, Pin.Active, Pin.Active],
+      [Pin.Disable, Pin.Disable, Pin.Disable, Pin.Active, Pin.Active],
+      [Pin.Active, Pin.Disable, Pin.Center, Pin.Disable, Pin.Active],
+      [Pin.Active, Pin.Active, Pin.Disable, Pin.Disable, Pin.Disable],
+      [Pin.Active, Pin.Active, Pin.Active, Pin.Disable, Pin.Active]
+    ]);
+    _toAnimate$ = BehaviorSubject<bool>.seeded(false);
+    _pieceMoved$ = BehaviorSubject<bool>.seeded(false);
+  }
+
   bool checkDestinationReachable(
       int positionI, int positionJ, int destinationI, int destinationJ) {
     int offsetI = destinationI - positionI;
